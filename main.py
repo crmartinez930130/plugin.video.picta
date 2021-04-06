@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 # Module: default
-# Author: Roman V. M.
-# Created on: 28.11.2014
-# License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
+# Author: crmartinez
+# Created on: 18.3.2021
 
 import sys
-from urllib import urlencode
-from urlparse import parse_qsl
+from urllib.parse import urlencode, parse_qsl
 import xbmcgui
 import xbmcplugin
 import requests
