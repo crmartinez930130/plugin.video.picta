@@ -60,9 +60,9 @@ def get_categories():
 
 def get_videos(category):
 
-    url_docum = 'https://api.picta.cu/api/v2/publicacion/?page=1&tipologia_nombre_raw=Documental&ordering=-fecha_creacion'
-    url_pelic = 'https://api.picta.cu/api/v2/publicacion/?page=1&tipologia_nombre_raw=Pel%C3%ADcula&ordering=-fecha_creacion'
-    url_musicales = 'https://api.picta.cu/api/v2/publicacion/?page=1&tipologia_nombre_raw=Video%20Musical&ordering=-fecha_creacion'
+    url_docum = 'https://api.picta.cu/v2/publicacion/?page=1&tipologia_nombre_raw=Documental&ordering=-fecha_creacion'
+    url_pelic = 'https://api.picta.cu/v2/publicacion/?page=1&tipologia_nombre_raw=Pel%C3%ADcula&ordering=-fecha_creacion'
+    url_musicales = 'https://api.picta.cu/v2/publicacion/?page=1&tipologia_nombre_raw=Video%20Musical&ordering=-fecha_creacion'
     
     if category == 'Documentales':
         r = requests.get(url_docum)
@@ -96,11 +96,11 @@ def get_videos(category):
     if cant_page > 1:
         for i in range(cant_page - 1):
             if category == 'Documentales':
-               url = 'https://api.picta.cu/api/v2/publicacion/?page='+str(i+2)+'&tipologia_nombre_raw=Documental&ordering=-fecha_creacion'                        
+               url = 'https://api.picta.cu/v2/publicacion/?page='+str(i+2)+'&tipologia_nombre_raw=Documental&ordering=-fecha_creacion'                        
             if category == 'Peliculas':
-                url = 'https://api.picta.cu/api/v2/publicacion/?page='+str(i+2)+'&tipologia_nombre_raw=Pel%C3%ADcula&ordering=-fecha_creacion'
+                url = 'https://api.picta.cu/v2/publicacion/?page='+str(i+2)+'&tipologia_nombre_raw=Pel%C3%ADcula&ordering=-fecha_creacion'
             if category == 'Musicales':
-                url = url_musicales = 'https://api.picta.cu/api/v2/publicacion/?page='+str(i+2)+'&tipologia_nombre_raw=Video%20Musical&ordering=-fecha_creacion'
+                url = url_musicales = 'https://api.picta.cu/v2/publicacion/?page='+str(i+2)+'&tipologia_nombre_raw=Video%20Musical&ordering=-fecha_creacion'
             
             r = requests.get(url)
             result = r.json()
@@ -119,12 +119,7 @@ def get_videos(category):
                                           'genre': genero,
                                           'plot': v['descripcion'],
                                           'sub': v['url_subtitulo']})
-        
-        #VIDEOS[category].append({'name': 'Crab',
-        #               'thumb': 'http://www.vidsplay.com/wp-content/uploads/2017/04/crab-screenshot.jpg',
-        #               'video': 'https://www.picta.cu/videos/533bc056b15c4afc976ae746a5bcce55/manifest.mpd',
-        #               'genre': ''})
-                       
+                              
     """
     Get the list of videofiles/streams.
 
@@ -143,7 +138,7 @@ def get_videos(category):
 
 def get_series():
     
-    url_series = 'https://api.picta.cu/api/v2/serie/?page=1&ordering=-id'
+    url_series = 'https://api.picta.cu/v2/serie/?page=1&ordering=-id'
     r = requests.get(url_series)
     result = r.json()
     cant_page = result['count'] // 100 + 1
@@ -160,7 +155,7 @@ def get_series():
     
     if cant_page > 1:
         for i in range(cant_page - 1):
-            url = 'https://api.picta.cu/api/v2/serie/?page='+str(i+2)+'&ordering=-id'
+            url = 'https://api.picta.cu/v2/serie/?page='+str(i+2)+'&ordering=-id'
             r = requests.get(url)
             result = r.json()
             for v in result['results']:
