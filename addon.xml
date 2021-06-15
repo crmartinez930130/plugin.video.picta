@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.picta" version="1.0.0" name="Picta Kodi Video Plugin" provider-name="crmartinez">
-  <requires>
-    <import addon="xbmc.python" version="2.25.0"/>
-    <import addon="script.module.requests" version="2.22.0" />
-  </requires>
-  <extension point="xbmc.python.pluginsource" library="main.py">
-    <provides>video</provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <summary lang="en">Picta Kodi Video Plugin</summary>
-    <assets>
-      <icon>icon.png</icon>
-      <fanart>fanart.jpg</fanart>
-    </assets>
-  </extension>
+<addon id="plugin.video.picta" version="1.0.1" name="Picta Kodi Video Plugin" provider-name="crmartinez">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.requests" version="2.22.0" />
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Picta Kodi Video Plugin</summary>
+        <description lang="en_GB">Video plugin for Kodi mediacenter.</description>
+        <disclaimer lang="en_GB">Videos are provided by www.picta.cu.</disclaimer>
+        <platform>all</platform>
+        <license>MIT</license>
+        <website>https://ww.picta.cu</website>
+        <source>https://github.com/oleksis/plugin.video.picta/tree/kodi_19</source>
+        <news>1.0.1 (2021-06-14)
+Added support for Kodi v19 (Matrix)
+Updated with latest artwork metadata
+        </news>
+        <assets>
+            <icon>resources/icon.png</icon>
+            <fanart>resources/fanart.jpg</fanart>
+        </assets>
+    </extension>
 </addon>
