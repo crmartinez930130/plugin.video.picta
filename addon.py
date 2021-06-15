@@ -421,10 +421,10 @@ def play_video(path):
     """
     # Create a playable item with a path to play.
     play_item = xbmcgui.ListItem(path=path)
-    play_item.setProperty("inputstreamaddon", "inputstream.adaptive")
-    play_item.setProperty("inputstream.adaptive.manifest_type", "mpd")
-    play_item.setMimeType("application/dash+xml")
     play_item.setContentLookup(False)
+    play_item.setMimeType("application/xml+dash")
+    play_item.setProperty("inputstream", "inputstream.adaptive")
+    play_item.setProperty("inputstream.adaptive.manifest_type", "mpd")
     xbmc.Player
     # Pass the item to the Kodi player.
     xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)

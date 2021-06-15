@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.picta" version="1.0.1" name="Picta Kodi Video Plugin" provider-name="crmartinez">
+<addon id="plugin.video.picta" version="1.0.2" name="Picta Kodi Video Plugin" provider-name="crmartinez">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.22.0" />
@@ -15,9 +15,11 @@
         <license>MIT</license>
         <website>https://ww.picta.cu</website>
         <source>https://github.com/oleksis/plugin.video.picta/tree/kodi_19</source>
-        <news>1.0.1 (2021-06-14)
-Added support for Kodi v19 (Matrix)
-Updated with latest artwork metadata
+        <news>1.0.2 (2021-06-15)
+Fix inputstreamaddon deprecated for Kodi v19 (Matrix): https://forum.kodi.tv/showthread.php?tid=353560
+Depends:
+  System -> Add-ons -> VideoPlayer InputStream -> InputStream Adaptative
+  System -> Add-ons -> VideoPlayer InputStream -> InputStream FFmpeg Direct
         </news>
         <assets>
             <icon>resources/icon.png</icon>
