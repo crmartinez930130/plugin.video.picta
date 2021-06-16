@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.picta" version="1.0.2" name="Picta Kodi Video Plugin" provider-name="crmartinez">
+<addon id="plugin.video.picta" version="1.0.3" name="Picta" provider-name="crmartinez">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.22.0" />
@@ -8,14 +8,14 @@
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Picta Kodi Video Plugin</summary>
-        <description lang="en_GB">Video plugin for Kodi mediacenter.</description>
+        <summary lang="en_GB">Picta Plataforma de Contenidos Audiovisuales de Cuba</summary>
+        <description lang="en_GB">Video plugin for Kodi mediacenter for www.picta.cu.</description>
         <disclaimer lang="en_GB">Videos are provided by www.picta.cu.</disclaimer>
         <platform>all</platform>
         <license>MIT</license>
         <website>https://ww.picta.cu</website>
         <source>https://github.com/oleksis/plugin.video.picta/tree/kodi_19</source>
-        <news>1.0.2 (2021-06-15)
+        <news>1.0.3 (2021-06-16)
 Fix inputstreamaddon deprecated for Kodi v19 (Matrix): https://forum.kodi.tv/showthread.php?tid=353560
 Depends:
   System -> Add-ons -> VideoPlayer InputStream -> InputStream Adaptative

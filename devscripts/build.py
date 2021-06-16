@@ -17,7 +17,7 @@ ignore = ignore_patterns(
     ".*",
     "*.zip",
     "docs",
-    "scripts",
+    "devscripts",
     "tests",
     "venv",
     "requirements*",
