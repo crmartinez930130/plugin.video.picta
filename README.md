@@ -20,6 +20,10 @@ For Kodi matrix and later releases
 * Open Kodi, go to Add-ons and select "Install from zip file"
 * Select the file `plugin.video.picta-kodi_19.zip`
 
+### Depends
+* System -> Add-ons -> VideoPlayer InputStream -> InputStream Adaptative
+* System -> Add-ons -> VideoPlayer InputStream -> InputStream FFmpeg Direct
+
 ## Copyright and license
 
-This add-on is licensed under the MIT License - see `LICENSE.txt` for details.
+This add-on is licensed under the MIT License - see [LICENSE.txt](LICENSE.txt) for details.

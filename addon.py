@@ -24,6 +24,11 @@ _handle = int(sys.argv[1])
 # from some web-site or online service.
 VIDEOS = {"Documentales": [], "Peliculas": [], "Musicales": [], "Series": []}
 
+ROOT_BASE_URL = "https://www.picta.cu/"
+API_BASE_URL = "https://api.picta.cu/v2/"
+
+# TODO: Manage requests.exceptions.ConnectionError
+
 
 def get_url(**kwargs):
     """
@@ -34,7 +39,7 @@ def get_url(**kwargs):
     :return: plugin call URL
     :rtype: str
     """
-    return "{0}?{1}".format(_url, urlencode(kwargs))
+    return f"{_url}?{urlencode(kwargs)}"
 
 
 def get_categories():
@@ -70,9 +75,13 @@ def get_videos(category):
     :return: the list of videos in the category
     :rtype: list
     """
-    url_docum = "https://api.picta.cu/v2/publicacion/?page=1&tipologia_nombre_raw=Documental&ordering=-fecha_creacion"
-    url_pelic = "https://api.picta.cu/v2/publicacion/?page=1&tipologia_nombre_raw=Pel%C3%ADcula&ordering=-fecha_creacion"
-    url_musicales = "https://api.picta.cu/v2/publicacion/?page=1&tipologia_nombre_raw=Video%20Musical&ordering=-fecha_creacion"
+    url_docum = f"{API_BASE_URL}publicacion/?page=1&tipologia_nombre_raw=Documental&ordering=-fecha_creacion"
+    url_pelic = f"{API_BASE_URL}publicacion/?page=1&tipologia_nombre_raw=Pel%C3%ADcula&ordering=-fecha_creacion"
+    url_musicales = f"{API_BASE_URL}publicacion/?page=1&tipologia_nombre_raw=Video%20Musical&ordering=-fecha_creacion"
+
+    result = {}
+    cant_page = 1
+    url = API_BASE_URL
 
     if category == "Documentales":
         r = requests.get(url_docum)
@@ -110,23 +119,13 @@ def get_videos(category):
     if cant_page > 1:
         for i in range(cant_page - 1):
             if category == "Documentales":
-                url = (
-                    "https://api.picta.cu/v2/publicacion/?page="
-                    + str(i + 2)
-                    + "&tipologia_nombre_raw=Documental&ordering=-fecha_creacion"
-                )
+                url = f"{API_BASE_URL}publicacion/?page={str(i + 2)}&tipologia_nombre_raw=Documental&ordering=-fecha_creacion"
             if category == "Peliculas":
-                url = (
-                    "https://api.picta.cu/v2/publicacion/?page="
-                    + str(i + 2)
-                    + "&tipologia_nombre_raw=Pel%C3%ADcula&ordering=-fecha_creacion"
-                )
+                url = f"{API_BASE_URL}publicacion/?page={str(i + 2)}&tipologia_nombre_raw=Pel%C3%ADcula&ordering=-fecha_creacion"
             if category == "Musicales":
-                url = url_musicales = (
-                    "https://api.picta.cu/v2/publicacion/?page="
-                    + str(i + 2)
-                    + "&tipologia_nombre_raw=Video%20Musical&ordering=-fecha_creacion"
-                )
+                url = (
+                    url_musicales
+                ) = f"{API_BASE_URL}publicacion/?page={str(i + 2)}&tipologia_nombre_raw=Video%20Musical&ordering=-fecha_creacion"
 
             r = requests.get(url)
             result = r.json()
@@ -154,7 +153,7 @@ def get_videos(category):
 
 def get_series():
 
-    url_series = "https://api.picta.cu/v2/serie/?page=1&ordering=-id"
+    url_series = f"{API_BASE_URL}serie/?page=1&ordering=-id"
     r = requests.get(url_series)
     result = r.json()
     cant_page = result["count"] // 100 + 1
@@ -175,7 +174,7 @@ def get_series():
 
     if cant_page > 1:
         for i in range(cant_page - 1):
-            url = "https://api.picta.cu/v2/serie/?page=" + str(i + 2) + "&ordering=-id"
+            url = f"{API_BASE_URL}serie/?page={str(i + 2)}&ordering=-id"
             r = requests.get(url)
             result = r.json()
             for v in result["results"]:
@@ -198,9 +197,7 @@ def get_series():
 def get_episodes(id, temp):
 
     EPISODIOS = []
-    url_temp = (
-        "https://api.picta.cu/v2/temporada/?serie_pelser_id=" + id + "&ordering=nombre"
-    )
+    url_temp = f"{API_BASE_URL}temporada/?serie_pelser_id={id}&ordering=nombre"
     r = requests.get(url_temp)
     result = r.json()
 
@@ -209,13 +206,7 @@ def get_episodes(id, temp):
         temp_id = result["results"][t]["id"]
         size = result["results"][t]["cantidad_capitulos"]
 
-        url_publicacion = (
-            "https://api.picta.cu/v2/publicacion/?temporada_id="
-            + str(temp_id)
-            + "&page=1&page_size="
-            + str(size)
-            + "&ordering=nombre"
-        )
+        url_publicacion = f"{API_BASE_URL}publicacion/?temporada_id={str(temp_id)}&page=1&page_size={str(size)}&ordering=nombre"
         r = requests.get(url_publicacion)
         result = r.json()
 
@@ -425,7 +416,7 @@ def play_video(path):
     play_item.setMimeType("application/xml+dash")
     play_item.setProperty("inputstream", "inputstream.adaptive")
     play_item.setProperty("inputstream.adaptive.manifest_type", "mpd")
-    xbmc.Player
+    #xbmc.Player
     # Pass the item to the Kodi player.
     xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
 
