@@ -410,13 +410,13 @@ def play_video(path):
     :param path: Fully-qualified video URL
     :type path: str
     """
+    # TODO: Add support for HLS(m3u8)
     # Create a playable item with a path to play.
     play_item = xbmcgui.ListItem(path=path)
     play_item.setContentLookup(False)
     play_item.setMimeType("application/xml+dash")
     play_item.setProperty("inputstream", "inputstream.adaptive")
     play_item.setProperty("inputstream.adaptive.manifest_type", "mpd")
-    #xbmc.Player
     # Pass the item to the Kodi player.
     xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
 
