@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.picta" version="1.0.3" name="Picta" provider-name="crmartinez">
+<addon
+    id="plugin.video.picta"
+    version="1.0.4"
+    name="Picta"
+    provider-name="crmartinez, oleksis">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.requests" version="2.22.0" />
+        <import addon="script.module.requests" version="2.22.0"/>
+        <import addon="inputstream.adaptive" version="2.6.16"/>
+        <import addon="inputstream.ffmpegdirect" version="1.21.3"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="addon.py">
         <provides>video</provides>
@@ -15,15 +21,14 @@
         <license>MIT</license>
         <website>https://ww.picta.cu</website>
         <source>https://github.com/oleksis/plugin.video.picta/tree/kodi_19</source>
-        <news>1.0.3 (2021-06-16)
-Fix inputstreamaddon deprecated for Kodi v19 (Matrix): https://forum.kodi.tv/showthread.php?tid=353560
-Depends:
-  System -> Add-ons -> VideoPlayer InputStream -> InputStream Adaptative
-  System -> Add-ons -> VideoPlayer InputStream -> InputStream FFmpeg Direct
+        <news>1.0.4 (2021-06-17)
+Add requires InputStream: Adaptative, FFmpeg Direct
+Add screenshots
         </news>
         <assets>
             <icon>resources/icon.png</icon>
             <fanart>resources/fanart.jpg</fanart>
+            <screenshot>resources/images/screenshot-01.png</screenshot>
         </assets>
     </extension>
 </addon>
