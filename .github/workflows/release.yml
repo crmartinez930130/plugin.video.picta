@@ -2,8 +2,6 @@ name: Upload Release Asset
 
 on: 
   push:
-    branches:
-      - master
     tags:
       - 'v*'
 
@@ -54,7 +52,7 @@ jobs:
       env:
         SHA2_WINDOWS: ${{ steps.sha2_file.outputs.sha2_windows }}
       run: |
-        echo "$SHA2_WINDOWS  plugin.video.picta-kodi_19.zip" > SHA2-256SUMS
+        echo "${env:SHA2_WINDOWS}  plugin.video.picta-kodi_19.zip" > SHA2-256SUMS
     - name: Upload SHA2-256SUMS to Release
       id: upload-release-sha2 
       uses: actions/upload-release-asset@v1
