@@ -7,6 +7,7 @@
 
 
 import sys
+from time import sleep
 from urllib.parse import parse_qsl, urlencode
 
 import requests
@@ -76,79 +77,48 @@ def get_videos(category):
     :return: the list of videos in the category
     :rtype: list
     """
-    url_docum = f"{API_BASE_URL}publicacion/?page=1&tipologia_nombre_raw=Documental&ordering=-fecha_creacion"
-    url_pelic = f"{API_BASE_URL}publicacion/?page=1&tipologia_nombre_raw=Pel%C3%ADcula&ordering=-fecha_creacion"
-    url_musicales = f"{API_BASE_URL}publicacion/?page=1&tipologia_nombre_raw=Video%20Musical&ordering=-fecha_creacion"
-
     result = {}
-    cant_page = 1
-    url = API_BASE_URL
+    next_page = 1
+    # TODO: REFACTOR: ListItem with next
+    while next_page:
+        url_docum = f"{API_BASE_URL}publicacion/?page={next_page}&tipologia_nombre_raw=Documental&ordering=-fecha_creacion"
+        url_pelic = f"{API_BASE_URL}publicacion/?page={next_page}&tipologia_nombre_raw=Pel%C3%ADcula&ordering=-fecha_creacion"
+        url_musicales = f"{API_BASE_URL}publicacion/?page={next_page}&tipologia_nombre_raw=Video%20Musical&ordering=-fecha_creacion"
 
-    if category == "Documentales":
-        r = requests.get(url_docum)
-        result = r.json()
-        cant_page = result["count"] // 100 + 1
-    elif category == "Peliculas":
-        r = requests.get(url_pelic)
-        result = r.json()
-        cant_page = result["count"] // 100 + 1
-    elif category == "Musicales":
-        r = requests.get(url_musicales)
-        result = r.json()
-        cant_page = result["count"] // 100 + 1
-
-    for v in result["results"]:
-        genero = ""
-        if category == "Musicales":
-            for g in v["categoria"]["video"]["genero"]:
-                genero = genero + "  " + g["nombre"]
-        elif category == "Peliculas":
-            for g in v["categoria"]["pelicula"]["genero"]:
-                genero = genero + "  " + g["nombre"]
-
-        VIDEOS[category].append(
-            {
-                "name": v["nombre"],
-                "thumb": v["url_imagen"] + "_380x250",
-                "video": v["url_manifiesto"],
-                "genre": genero,
-                "plot": v["descripcion"],
-                "sub": v["url_subtitulo"],
-            }
-        )
-    # TODO: REFACTOR using next_href
-    if cant_page > 1:
-        for i in range(cant_page - 1):
-            if category == "Documentales":
-                url = f"{API_BASE_URL}publicacion/?page={str(i + 2)}&tipologia_nombre_raw=Documental&ordering=-fecha_creacion"
-            if category == "Peliculas":
-                url = f"{API_BASE_URL}publicacion/?page={str(i + 2)}&tipologia_nombre_raw=Pel%C3%ADcula&ordering=-fecha_creacion"
-            if category == "Musicales":
-                url = (
-                    url_musicales
-                ) = f"{API_BASE_URL}publicacion/?page={str(i + 2)}&tipologia_nombre_raw=Video%20Musical&ordering=-fecha_creacion"
-
-            r = requests.get(url)
+        if category == "Documentales":
+            r = requests.get(url_docum)
             result = r.json()
-            for v in result["results"]:
-                genero = ""
-                if category == "Musicales":
-                    for g in v["categoria"]["video"]["genero"]:
-                        genero = genero + "  " + g["nombre"]
-                elif category == "Peliculas":
-                    for g in v["categoria"]["pelicula"]["genero"]:
-                        genero = genero + "  " + g["nombre"]
+        elif category == "Peliculas":
+            r = requests.get(url_pelic)
+            result = r.json()
+        elif category == "Musicales":
+            r = requests.get(url_musicales)
+            result = r.json()
 
-                VIDEOS[category].append(
-                    {
-                        "name": v["nombre"],
-                        "thumb": v["url_imagen"] + "_380x250",
-                        "video": v["url_manifiesto"],
-                        "genre": genero,
-                        "plot": v["descripcion"],
-                        "sub": v["url_subtitulo"],
-                    }
-                )
+        for v in result["results"]:
+            genero = ""
+            if category == "Musicales":
+                for g in v["categoria"]["video"]["genero"]:
+                    genero = genero + "  " + g["nombre"]
+            elif category == "Peliculas":
+                for g in v["categoria"]["pelicula"]["genero"]:
+                    genero = genero + "  " + g["nombre"]
+
+            VIDEOS[category].append(
+                {
+                    "name": v["nombre"],
+                    "thumb": v["url_imagen"] + "_380x250",
+                    "video": v["url_manifiesto"],
+                    "genre": genero,
+                    "plot": v["descripcion"],
+                    "sub": v["url_subtitulo"],
+                }
+            )
+
+        next_page = result.get("next")
+        # Avoid rate limit (seconds/request)
+        sleep(1 / 20)
+
     return VIDEOS[category]
 
 

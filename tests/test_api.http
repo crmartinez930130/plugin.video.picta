@@ -5,11 +5,28 @@
 @version = v2
 @baseUrl = https://{{host}}/{{version}}
 @contentType = application/json
+@publicacionEndpoint = {{baseUrl}}/publicacion/
 
 ###
 
-GET {{baseUrl}}/publicacion/
+GET {{publicacionEndpoint}}
     ?page=1
     &tipologia_nombre_raw=Video%20Musical
+    &ordering=-fecha_creacion
+Content-Type: {{contentType}}
+
+###
+
+GET {{publicacionEndpoint}}
+    ?page=1
+    &tipologia_nombre_raw=Documental
+    &ordering=-fecha_creacion
+Content-Type: {{contentType}}
+
+###
+
+GET {{publicacionEndpoint}}
+    ?page=1
+    &tipologia_nombre_raw=Pel%C3%ADcula
     &ordering=-fecha_creacion
 Content-Type: {{contentType}}

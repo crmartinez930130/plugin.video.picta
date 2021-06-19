@@ -28,6 +28,7 @@ class PluginTestCase(TestCase):
         ]
         from resources.plugin import get_videos
 
+        # Test Musicales
         json_data = [
             json.loads(
                 self.load_json_file(
@@ -39,18 +40,83 @@ class PluginTestCase(TestCase):
         mock_get.return_value.json.side_effect = json_data
 
         videos = get_videos("Musicales")
+        expected = {
+            "name": "CON CUBA NO TE METAS - Virulo",
+            "thumb": "https://www.picta.cu/imagen/img_5mBRhLl.jpeg_380x250",
+            "video": "https://www.picta.cu/videos/9b25196524f94db49a07d81cb0b9b471/manifest.mpd",
+            "genre": "  Conga",
+            "plot": "Ministerio de Cultura de Cuba",
+            "sub": "",
+        }
 
-        self.assertEqual(videos[0].get("name"), "CON CUBA NO TE METAS - Virulo")
-        self.assertEqual(
-            videos[0].get("thumb"),
-            "https://www.picta.cu/imagen/img_5mBRhLl.jpeg_380x250",
-        )
-        self.assertEqual(
-            videos[0].get("video"),
-            "https://www.picta.cu/videos/9b25196524f94db49a07d81cb0b9b471/manifest.mpd",
-        )
-        self.assertEqual(videos[0].get("genre"), "  Conga")
-        self.assertEqual(videos[0].get("plot"), "Ministerio de Cultura de Cuba")
-        self.assertEqual(videos[0].get("sub"), "")
-
+        self.assertDictEqual(videos[0], expected)
         self.assertEqual(len(videos), 296)
+
+        # Test Documentales
+        json_data = [
+            json.loads(
+                self.load_json_file(
+                    f"./tests/mocks/api_videos_documental_page_{idx}.json"
+                )
+            )
+            for idx in range(1, 3)
+        ]
+        mock_get.return_value.json.side_effect = json_data
+
+        videos = get_videos("Documentales")
+        expected = {
+            "name": "La Historia de Pixar",
+            "thumb": "https://www.picta.cu/imagen/img_lUFmT8c.jpeg_380x250",
+            "video": "https://www.picta.cu/videos/49be1481dfdb4eed84c8394c9544be42/manifest.mpd",
+            "genre": "",
+            "plot": (
+                "The Pixar Story, dirigido por Leslie Iwerks, es un documental de "
+                "la historia de la compañía Pixar Animation Studios.\r\n\r\nLa primera "
+                "versión de la película se estrenó en el Sonoma Film Festival, en 2007, "
+                "y tenía una duración teatral limitada después de que un año antes "
+                "fuese tomada por la red de cable Starz en Estados Unidos.\r\n\r\nLa "
+                "cinta se estrenó, fuera de Estados Unidos, en formato DVD en el verano "
+                'de 2008 como parte de "Ultimate Pixar Collection",\u200b un box set de '
+                "las películas de Pixar. Se incluyó como una sección especial en la "
+                "edición especial de DVD y Blu-ray de WALL·E, que se lanzó el 18 de "
+                "noviembre de 2008. \r\n\r\n<< no olvide suscribirse al canal para "
+                "conocer sobre nuevos materiales, asi como calificar esta publicación. gracias >>"
+            ),
+            "sub": "",
+        }
+
+        self.assertDictEqual(videos[0], expected)
+        self.assertEqual(len(videos), 118)
+
+        # Test Peliculas
+        json_data = [
+            json.loads(
+                self.load_json_file(
+                    f"./tests/mocks/api_videos_pelicula_page_{idx}.json"
+                )
+            )
+            for idx in range(1, 6)
+        ]
+        mock_get.return_value.json.side_effect = json_data
+
+        videos = get_videos("Peliculas")
+        expected = {
+            "name": "Luca",
+            "thumb": "https://www.picta.cu/imagen/img_cbyHM4G.jpeg_380x250",
+            "video": "https://www.picta.cu/videos/26fcf76822d647a681e2ca0a610cda3e/manifest.mpd",
+            "genre": "  Animación  Aventura  Comedia  Fantasía",
+            "plot": (
+                "Ambientada en un hermoso pueblo costero de la Riviera italiana, "
+                "esta nueva película animada original es la historia del paso de "
+                "la niñez a la adultez de un niño que vive un verano inolvidable "
+                "repleto de gelato, pastas y viajes interminables en scooter. "
+                "Luca comparte estas aventuras con su nuevo mejor amigo, pero toda "
+                "la diversión se ve amenazada por un secreto muy bien escondido: "
+                "Luca es un monstruo marino de un mundo que se encuentra justo por "
+                "debajo de la superficie del agua."
+            ),
+            "sub": "",
+        }
+
+        self.assertDictEqual(videos[0], expected)
+        self.assertEqual(len(videos), 445)

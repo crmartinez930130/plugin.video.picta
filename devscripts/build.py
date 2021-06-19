@@ -23,6 +23,7 @@ ignore = ignore_patterns(
     "requirements*",
     "__pycache__",
     "debug.log",
+    "Makefile",
 )
 addon_path = f"{src_dir}/{build_dir}/{addon_name}"
 
