@@ -44,7 +44,7 @@ class PluginTestCase(TestCase):
             "name": "CON CUBA NO TE METAS - Virulo",
             "thumb": "https://www.picta.cu/imagen/img_5mBRhLl.jpeg_380x250",
             "video": "https://www.picta.cu/videos/9b25196524f94db49a07d81cb0b9b471/manifest.mpd",
-            "genre": "  Conga",
+            "genre": "Conga",
             "plot": "Ministerio de Cultura de Cuba",
             "sub": "",
         }
@@ -104,7 +104,7 @@ class PluginTestCase(TestCase):
             "name": "Luca",
             "thumb": "https://www.picta.cu/imagen/img_cbyHM4G.jpeg_380x250",
             "video": "https://www.picta.cu/videos/26fcf76822d647a681e2ca0a610cda3e/manifest.mpd",
-            "genre": "  Animación  Aventura  Comedia  Fantasía",
+            "genre": "Animación, Aventura, Comedia, Fantasía",
             "plot": (
                 "Ambientada en un hermoso pueblo costero de la Riviera italiana, "
                 "esta nueva película animada original es la historia del paso de "
@@ -120,3 +120,77 @@ class PluginTestCase(TestCase):
 
         self.assertDictEqual(videos[0], expected)
         self.assertEqual(len(videos), 445)
+
+    @patch("sys.argv")
+    @patch("requests.get")
+    def test_get_series(self, mock_get, mock_argv):
+        mock_argv.return_value = [
+            "plugin://plugin.video.picta/",
+            "1",
+            "",
+            "resume:false",
+        ]
+        from resources.plugin import get_series
+
+        # Test Series
+        json_data = [
+            json.loads(
+                self.load_json_file(f"./tests/mocks/api_videos_serie_page_{idx}.json")
+            )
+            for idx in range(1, 4)
+        ]
+        mock_get.return_value.json.side_effect = json_data
+
+        videos = get_series()
+        expected = {
+            "name": "Calculo",
+            "id": 824,
+            "thumb": "https://www.picta.cu/imagen/img_lo20hRv.jpeg_380x250",
+            "genre": "Serie Documental",
+            "cant_temp": 2,
+        }
+
+        self.assertDictEqual(videos[0], expected)
+        self.assertEqual(len(videos), 280)
+
+    @patch("sys.argv")
+    @patch("requests.get")
+    def test_get_episodes(self, mock_get, mock_argv):
+        mock_argv.return_value = [
+            "plugin://plugin.video.picta/",
+            "1",
+            "",
+            "resume:false",
+        ]
+        from resources.plugin import get_episodes
+
+        # Test Episodes
+        json_data = [
+            json.loads(
+                self.load_json_file(
+                    f"./tests/mocks/api_videos_serie_temporada_224.json"
+                )
+            ),
+            json.loads(
+                self.load_json_file(
+                    f"./tests/mocks/api_videos_serie_temporada_capitulos.json"
+                )
+            ),
+        ]
+        mock_get.return_value.json.side_effect = json_data
+
+        videos = get_episodes("224", "0")
+        expected = {
+            "name": "Biohackers 1x01",
+            "thumb": "https://www.picta.cu/imagen/img_30VUtC6.jpeg_380x250",
+            "video": "https://www.picta.cu/videos/86c1c873227c410a9f8195c0643c4e6c/manifest.mpd",
+            "plot": (
+                "Una estudiante de medicina va a la universidad con una misión "
+                "secreta: exponer la supuesta conspiración que vincula una tragedia "
+                "familiar con una profesora de biología."
+            ),
+            "sub": "https://www.picta.cu/sub/86c1c873227c410a9f8195c0643c4e6c",
+        }
+
+        self.assertDictEqual(videos[0], expected)
+        self.assertEqual(len(videos), 6)

@@ -6,6 +6,8 @@
 @baseUrl = https://{{host}}/{{version}}
 @contentType = application/json
 @publicacionEndpoint = {{baseUrl}}/publicacion/
+@serieEndpoint = {{baseUrl}}/serie/
+@serieByTemporadaEndpoint = {{baseUrl}}/temporada/
 
 ###
 
@@ -29,4 +31,27 @@ GET {{publicacionEndpoint}}
     ?page=1
     &tipologia_nombre_raw=Pel%C3%ADcula
     &ordering=-fecha_creacion
+Content-Type: {{contentType}}
+
+###
+
+GET {{serieEndpoint}}
+    ?page=1
+    &ordering=-id
+Content-Type: {{contentType}}
+
+###
+
+GET {{serieByTemporadaEndpoint}}
+    ?serie_pelser_id=224
+    &ordering=nombre
+Content-Type: {{contentType}}
+
+###
+
+GET {{publicacionEndpoint}}
+    ?temporada_id=132
+    &page=1
+    &page_size=6
+    &ordering=nombre
 Content-Type: {{contentType}}

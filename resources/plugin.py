@@ -96,20 +96,23 @@ def get_videos(category):
             result = r.json()
 
         for v in result["results"]:
-            genero = ""
+            generos = ""
+
             if category == "Musicales":
-                for g in v["categoria"]["video"]["genero"]:
-                    genero = genero + "  " + g["nombre"]
+                generos = ", ".join(
+                    g["nombre"] for g in v["categoria"]["video"]["genero"]
+                )
             elif category == "Peliculas":
-                for g in v["categoria"]["pelicula"]["genero"]:
-                    genero = genero + "  " + g["nombre"]
+                generos = ", ".join(
+                    g["nombre"] for g in v["categoria"]["pelicula"]["genero"]
+                )
 
             VIDEOS[category].append(
                 {
                     "name": v["nombre"],
                     "thumb": v["url_imagen"] + "_380x250",
                     "video": v["url_manifiesto"],
-                    "genre": genero,
+                    "genre": generos,
                     "plot": v["descripcion"],
                     "sub": v["url_subtitulo"],
                 }
@@ -124,43 +127,29 @@ def get_videos(category):
 
 def get_series():
 
-    url_series = f"{API_BASE_URL}serie/?page=1&ordering=-id"
-    r = requests.get(url_series)
-    result = r.json()
-    cant_page = result["count"] // 100 + 1
+    next_page = 1
+    # TODO: REFACTOR: ListItem with next
+    while next_page:
+        url_series = f"{API_BASE_URL}serie/?page={next_page}&ordering=-id"
+        r = requests.get(url_series)
+        result = r.json()
 
-    for v in result["results"]:
-        genero = ""
-        for g in v["genero"]:
-            genero = genero + "  " + g["nombre"]
-        VIDEOS["Series"].append(
-            {
-                "name": v["nombre"],
-                "id": v["pelser_id"],
-                "thumb": v["imagen_secundaria"] + "_380x250",
-                "genre": genero,
-                "cant_temp": v["cantidad_temporadas"],
-            }
-        )
+        for v in result["results"]:
+            generos = ", ".join(g["nombre"] for g in v["genero"])
 
-    if cant_page > 1:
-        for i in range(cant_page - 1):
-            url = f"{API_BASE_URL}serie/?page={str(i + 2)}&ordering=-id"
-            r = requests.get(url)
-            result = r.json()
-            for v in result["results"]:
-                genero = ""
-                for g in v["genero"]:
-                    genero = genero + "  " + g["nombre"]
-                VIDEOS["Series"].append(
-                    {
-                        "name": v["nombre"],
-                        "id": v["pelser_id"],
-                        "thumb": v["imagen_secundaria"] + "_380x250",
-                        "genre": genero,
-                        "cant_temp": v["cantidad_temporadas"],
-                    }
-                )
+            VIDEOS["Series"].append(
+                {
+                    "name": v["nombre"],
+                    "id": v["pelser_id"],
+                    "thumb": v["imagen_secundaria"] + "_380x250",
+                    "genre": generos,
+                    "cant_temp": v["cantidad_temporadas"],
+                }
+            )
+
+        next_page = result.get("next")
+        # Avoid rate limit (seconds/request)
+        sleep(1 / 20)
 
     return VIDEOS["Series"]
 
@@ -177,7 +166,7 @@ def get_episodes(id, temp):
         temp_id = result["results"][t]["id"]
         size = result["results"][t]["cantidad_capitulos"]
 
-        url_publicacion = f"{API_BASE_URL}publicacion/?temporada_id={str(temp_id)}&page=1&page_size={str(size)}&ordering=nombre"
+        url_publicacion = f"{API_BASE_URL}publicacion/?temporada_id={temp_id}&page=1&page_size={size}&ordering=nombre"
         r = requests.get(url_publicacion)
         result = r.json()
 
