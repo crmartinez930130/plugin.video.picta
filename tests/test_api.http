@@ -1,0 +1,15 @@
+
+@hostname = api.picta.cu
+@port = 443
+@host = {{hostname}}:{{port}}
+@version = v2
+@baseUrl = https://{{host}}/{{version}}
+@contentType = application/json
+
+###
+
+GET {{baseUrl}}/publicacion/
+    ?page=1
+    &tipologia_nombre_raw=Video%20Musical
+    &ordering=-fecha_creacion
+Content-Type: {{contentType}}
