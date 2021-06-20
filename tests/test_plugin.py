@@ -3,7 +3,13 @@ import sys
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from resources.plugin import get_episodes, get_series, get_videos
+from resources.plugin import (
+    get_canales,
+    get_canales_videos,
+    get_episodes,
+    get_series,
+    get_videos,
+)
 
 sys.modules["xbmc"] = xbmcMock = MagicMock()
 sys.modules["xbmcaddon"] = MagicMock()
@@ -182,3 +188,63 @@ class PluginTestCase(TestCase):
 
         self.assertDictEqual(videos[0], expected)
         self.assertEqual(len(videos), 6)
+
+    @patch("requests.get")
+    def test_get_canales(self, mock_get):
+        """Test Canales"""
+        json_data = [
+            json.loads(
+                self.load_json_file(f"./tests/mocks/api_videos_canal_page_{idx}.json")
+            )
+            for idx in range(1, 4)
+        ]
+        mock_get.return_value.json.side_effect = json_data
+
+        canales = get_canales()
+        expected = {
+            "name": "Películas",
+            "id": 16,
+            "thumb": "https://www.picta.cu/imagen/Pel%C3%ADculas1.png_380x250",
+            "plot": "Películas sobre géneros variados.",
+        }
+        self.assertDictEqual(canales[0], expected)
+        self.assertEqual(len(canales), 253)
+
+    @patch("requests.get")
+    def test_get_canales_videos(self, mock_get):
+        """Test Canales Videos"""
+        json_data = [
+            json.loads(
+                self.load_json_file(f"./tests/mocks/api_videos_canal_bachecubano.json")
+            )
+        ]
+        mock_get.return_value.json.side_effect = json_data
+
+        videos = get_canales_videos("Bachecubano")
+        expected = {
+            "name": "Pesquisador Virtual para Cuba en tiempos de COVID19",
+            "thumb": "https://www.picta.cu/imagen/img_iMbjsnc.jpeg_380x250",
+            "video": "https://www.picta.cu/videos/bd6b880cd2444bc094cbb167aa9c4113/manifest.mpd",
+            "genre": "",
+            "plot": (
+                "La Universidad de las Ciencias Informáticas, de conjunto con los "
+                "ministerios de Salud Pública y de Comunicaciones, lanzó Pesquisador "
+                "Virtual, una aplicación para recabar información sobre el estado de "
+                "salud de la población, como complemento del proceso de pesquisa "
+                "activa que realiza el sistema de salud cubano en el marco del "
+                'enfrentamiento epidemiológico de la pandemia COVID-19.\r\n\r\n"Para '
+                "utilizar esta plataforma usted debe tener más de 18 años de edad y "
+                "estar en plena capacidad legal. Usted se responsabiliza con la "
+                "absoluta veracidad de la información suministrada. Esta información "
+                "será analizada exclusivamente por el sistema de salud y al llenar la "
+                "encuesta usted expresa su conformidad con la utilización de sus "
+                'datos", cita Apklis en la descripción de la aplicación.\r\n\r\nLa apk '
+                "funciona con acceso a Internet y es libre de costo. Los interesados "
+                "podrán descargarla desde la tienda cubana de aplicaciones Apklis, o "
+                "vía web en la red del Ministerio de Salud Pública. \r\n\r\nLo puedes "
+                "descargar desde el enlace de ApkLis:\r\nhttps://www.apklis.cu/application/cu.online.survey"
+            ),
+            "sub": "",
+        }
+        self.assertDictEqual(videos[0], expected)
+        self.assertEqual(len(videos), 8)

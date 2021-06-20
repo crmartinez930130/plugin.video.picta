@@ -19,7 +19,13 @@ import xbmcplugin
 # Here we use a fixed set of properties simply for demonstrating purposes
 # In a "real life" plugin you will need to get info and links to video files/streams
 # from some web-site or online service.
-VIDEOS = {"Documentales": [], "Peliculas": [], "Musicales": [], "Series": []}
+VIDEOS = {
+    "Canales": [],
+    "Documentales": [],
+    "Peliculas": [],
+    "Musicales": [],
+    "Series": [],
+}
 
 ROOT_BASE_URL = "https://www.picta.cu/"
 API_BASE_URL = "https://api.picta.cu/v2/"
@@ -190,6 +196,62 @@ def get_episodes(id, temp):
     return EPISODIOS
 
 
+def get_canales():
+
+    next_page = 1
+    # TODO: REFACTOR: ListItem with next
+    while next_page:
+        url_canales = f"{API_BASE_URL}canal/?page={next_page}&ordering=-cantidad_suscripciones&nombre="
+        r = requests.get(url_canales)
+        result = r.json()
+
+        for ch in result["results"]:
+            VIDEOS["Canales"].append(
+                {
+                    "name": ch["nombre"],
+                    "id": ch["id"],
+                    "thumb": ch["url_imagen"] + "_380x250",
+                    "plot": ch["descripcion"],
+                }
+            )
+
+        next_page = result.get("next")
+        # Avoid rate limit (seconds/request)
+        sleep(1 / 20)
+
+    return VIDEOS["Canales"]
+
+
+def get_canales_videos(canal_nombre_raw):
+    VIDEOS = []
+
+    next_page = 1
+    # TODO: REFACTOR: ListItem with next
+    while next_page:
+        url_canal_videos = f"{API_BASE_URL}publicacion/?canal_nombre_raw={canal_nombre_raw}&page={next_page}"
+        r = requests.get(url_canal_videos)
+        result = r.json()
+
+        for v in result["results"]:
+            # Videos diferentes tipologias no siempre tienen genero
+            VIDEOS.append(
+                {
+                    "name": v["nombre"],
+                    "thumb": v["url_imagen"] + "_380x250",
+                    "video": v["url_manifiesto"],
+                    "genre": "",
+                    "plot": v["descripcion"],
+                    "sub": v["url_subtitulo"],
+                }
+            )
+
+            next_page = result.get("next")
+            # Avoid rate limit (seconds/request)
+            sleep(1 / 20)
+
+    return VIDEOS
+
+
 def list_categories(handle):
     """
     Create the list of video categories in the Kodi interface.
@@ -218,7 +280,7 @@ def list_categories(handle):
         #                          'genre': category,
         #                         'mediatype': 'video'})
         # Create a URL for a plugin recursive call.
-        # Example: plugin://plugin.video.example/?action=listing&category=Animals
+        # Example: plugin://plugin.video.picta/?action=listing&category=Series
         url = get_url(action="listing", category=category)
         # is_folder = True means that this item opens a sub-list of lower level items.
         is_folder = True
@@ -299,6 +361,42 @@ def list_series(handle):
     xbmcplugin.endOfDirectory(handle)
 
 
+def list_canales(handle):
+
+    xbmcplugin.setPluginCategory(handle, "Canales")
+
+    canales = get_canales()
+
+    for canal in canales:
+        list_item = xbmcgui.ListItem(label=canal["name"])
+        list_item.setInfo(
+            "video",
+            {"title": canal["name"], "plot": canal["plot"], "mediatype": "video"},
+        )
+        list_item.setArt(
+            {"thumb": canal["thumb"], "icon": canal["thumb"], "fanart": canal["thumb"]}
+        )
+        url = get_url(action="getChannelVideos", canal_nombre_raw=canal["name"])
+        is_folder = True
+        xbmcplugin.addDirectoryItem(handle, url, list_item, is_folder)
+
+    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_EPISODE)
+    xbmcplugin.endOfDirectory(handle)
+
+
+def list_channel_videos(handle, canal_nombre_raw):
+    params = dict(parse_qsl(f"canal_nombre={canal_nombre_raw}"))
+    xbmcplugin.setPluginCategory(handle, params["canal_nombre"])
+
+    videos = get_canales_videos(canal_nombre_raw)
+
+    for video in videos:
+        set_video_list(handle, video)
+
+    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    xbmcplugin.endOfDirectory(handle)
+
+
 def list_seasons(handle, pelser_id, temporada):
 
     xbmcplugin.setPluginCategory(handle, "Temporadas")
@@ -376,12 +474,16 @@ def router(paramstring):
         # Display the list of videos in a provided category.
         if params["category"] == "Series":
             list_series(handle)
+        elif params["category"] == "Canales":
+            list_canales(handle)
         else:
             list_videos(handle, params["category"])
     elif params["action"] == "getSeasons":
         list_seasons(handle, params["id"], params["temp"])
     elif params["action"] == "getEpisodes":
         list_episodes(handle, params["serie_id"], params["temp"])
+    elif params["action"] == "getChannelVideos":
+        list_channel_videos(handle, params["canal_nombre_raw"])
     elif params["action"] == "play":
         # Play a video from a provided URL.
         play_video(handle, params["video"])

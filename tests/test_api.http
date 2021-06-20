@@ -8,7 +8,7 @@
 @publicacionEndpoint = {{baseUrl}}/publicacion/
 @serieEndpoint = {{baseUrl}}/serie/
 @serieByTemporadaEndpoint = {{baseUrl}}/temporada/
-
+@canalEndpoint = {{baseUrl}}/canal/
 ###
 
 GET {{publicacionEndpoint}}
@@ -54,4 +54,19 @@ GET {{publicacionEndpoint}}
     &page=1
     &page_size=6
     &ordering=nombre
+Content-Type: {{contentType}}
+
+###
+
+GET {{canalEndpoint}}
+    ?page=1
+    &ordering=-cantidad_suscripciones
+    &nombre=
+Content-Type: {{contentType}}
+
+###
+
+GET {{publicacionEndpoint}}
+    ?canal_nombre_raw=Bachecubano
+    &page=1
 Content-Type: {{contentType}}
