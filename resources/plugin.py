@@ -15,11 +15,6 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 
-# Get the plugin url in plugin:// notation.
-_url = sys.argv[0]
-# Get the plugin handle as an integer number.
-_handle = int(sys.argv[1])
-
 # Free sample videos are provided by www.picta.cu
 # Here we use a fixed set of properties simply for demonstrating purposes
 # In a "real life" plugin you will need to get info and links to video files/streams
@@ -41,6 +36,8 @@ def get_url(**kwargs):
     :return: plugin call URL
     :rtype: str
     """
+    # Get the plugin url in plugin:// notation.
+    _url = sys.argv[0]
     return f"{_url}?{urlencode(kwargs)}"
 
 
@@ -171,11 +168,16 @@ def get_episodes(id, temp):
         result = r.json()
 
         for e in result["results"]:
+            generos = ", ".join(
+                g["nombre"]
+                for g in e["categoria"]["capitulo"]["temporada"]["serie"]["genero"]
+            )
             EPISODIOS.append(
                 {
                     "name": e["nombre"],
                     "thumb": e["url_imagen"] + "_380x250",
                     "video": e["url_manifiesto"],
+                    "genre": generos,
                     "plot": e["descripcion"],
                     "sub": e["url_subtitulo"],
                 }
@@ -188,19 +190,15 @@ def get_episodes(id, temp):
     return EPISODIOS
 
 
-def list_categories():
+def list_categories(handle):
     """
     Create the list of video categories in the Kodi interface.
     """
     # Set plugin category. It is displayed in some skins as the name
     # of the current section.
-    xbmcplugin.setPluginCategory(_handle, "My Video Collection")
-    # Set plugin content. It allows Kodi to select appropriate views
-    # for this type of content.
-    xbmcplugin.setContent(_handle, "videos")
-    # Get video categories
+    xbmcplugin.setPluginCategory(handle, "Categorías")
     categories = get_categories()
-    # Iterate through categories
+
     for category in categories:
         # Create a list item with a text label and a thumbnail image.
         list_item = xbmcgui.ListItem(label=category)
@@ -225,72 +223,62 @@ def list_categories():
         # is_folder = True means that this item opens a sub-list of lower level items.
         is_folder = True
         # Add our item to the Kodi virtual folder listing.
-        xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
+        xbmcplugin.addDirectoryItem(handle, url, list_item, is_folder)
     # Add a sort method for the virtual folder items (alphabetically, ignore articles)
-    xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     # Finish creating a virtual folder.
-    xbmcplugin.endOfDirectory(_handle)
+    xbmcplugin.endOfDirectory(handle)
 
 
-def list_videos(category):
+def set_video_list(handle, video):
+    """
+    Set Info and Directory to ListItem
+
+    Note: video have 6 keys: "name", "thumb", "video", "genre", "plot", "sub"
+    """
+    list_item = xbmcgui.ListItem(label=video["name"])
+    list_item.setInfo(
+        "video",
+        {
+            "title": video["name"],
+            "genre": video["genre"],
+            "plot": video["plot"],
+            "mediatype": "video",
+        },
+    )
+    list_item.setSubtitles([video["sub"]])
+    list_item.setArt(
+        {"thumb": video["thumb"], "icon": video["thumb"], "fanart": video["thumb"]}
+    )
+    list_item.setProperty("IsPlayable", "true")
+    url = get_url(action="play", video=video["video"])
+    is_folder = False
+    xbmcplugin.addDirectoryItem(handle, url, list_item, is_folder)
+
+
+def list_videos(handle, category):
     """
     Create the list of playable videos in the Kodi interface.
 
     :param category: Category name
     :type category: str
     """
-    # Set plugin category. It is displayed in some skins as the name
-    # of the current section.
-    xbmcplugin.setPluginCategory(_handle, category)
-    # Set plugin content. It allows Kodi to select appropriate views
-    # for this type of content.
-    xbmcplugin.setContent(_handle, "videos")
-    # Get the list of videos in the category.
+    xbmcplugin.setPluginCategory(handle, category)
+
     videos = get_videos(category)
-    # Iterate through videos.
+
     for video in videos:
-        # Create a list item with a text label and a thumbnail image.
-        list_item = xbmcgui.ListItem(label=video["name"])
-        # Set additional info for the list item.
-        # 'mediatype' is needed for skin to display info for this ListItem correctly.
-        list_item.setInfo(
-            "video",
-            {
-                "title": video["name"],
-                "genre": video["genre"],
-                "plot": video["plot"],
-                "mediatype": "video",
-            },
-        )
-        list_item.setSubtitles([video["sub"]])
-        # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
-        # Here we use the same image for all items for simplicity's sake.
-        # In a real-life plugin you need to set each image accordingly.
-        list_item.setArt(
-            {"thumb": video["thumb"], "icon": video["thumb"], "fanart": video["thumb"]}
-        )
-        # Set 'IsPlayable' property to 'true'.
-        # This is mandatory for playable items!
-        list_item.setProperty("IsPlayable", "true")
-        # Create a URL for a plugin recursive call.
-        # Example: plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/wp-content/uploads/2017/04/crab.mp4
-        url = get_url(action="play", video=video["video"])
-        # Add the list item to a virtual Kodi folder.
-        # is_folder = False means that this item won't open any sub-list.
-        is_folder = False
-        # Add our item to the Kodi virtual folder listing.
-        xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
-    # Add a sort method for the virtual folder items (alphabetically, ignore articles)
-    xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
-    # Finish creating a virtual folder.
-    xbmcplugin.endOfDirectory(_handle)
+        set_video_list(handle, video)
+
+    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    xbmcplugin.endOfDirectory(handle)
 
 
-def list_series():
+def list_series(handle):
 
-    xbmcplugin.setPluginCategory(_handle, "Series")
+    xbmcplugin.setPluginCategory(handle, "Series")
 
-    xbmcplugin.setContent(_handle, "tvshows")
+    xbmcplugin.setContent(handle, "tvshows")
 
     series = get_series()
 
@@ -305,65 +293,44 @@ def list_series():
         )
         url = get_url(action="getSeasons", id=serie["id"], temp=serie["cant_temp"])
         is_folder = True
-        xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
+        xbmcplugin.addDirectoryItem(handle, url, list_item, is_folder)
 
-    xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_EPISODE)
+    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_EPISODE)
+    xbmcplugin.endOfDirectory(handle)
 
-    xbmcplugin.endOfDirectory(_handle)
 
+def list_seasons(handle, pelser_id, temporada):
 
-def list_seasons(pelser_id, temporada):
-
-    xbmcplugin.setPluginCategory(_handle, "Seasons")
-    xbmcplugin.setContent(_handle, "season")
+    xbmcplugin.setPluginCategory(handle, "Temporadas")
+    xbmcplugin.setContent(handle, "season")
 
     cant_temp = int(temporada)
 
     for i in range(cant_temp):
-        list_item = xbmcgui.ListItem(label="Temporada " + str(i + 1))
+        list_item = xbmcgui.ListItem(label=f"Temporada {i + 1}")
         url = get_url(action="getEpisodes", serie_id=pelser_id, temp=i)
         is_folder = True
-        xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
+        xbmcplugin.addDirectoryItem(handle, url, list_item, is_folder)
 
-    xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    xbmcplugin.endOfDirectory(handle)
 
-    xbmcplugin.endOfDirectory(_handle)
 
+def list_episodes(handle, serie_id, temp):
 
-def list_episodes(serie_id, temp):
-
-    xbmcplugin.setPluginCategory(_handle, "Episodes")
-
-    xbmcplugin.setContent(_handle, "episodes")
+    xbmcplugin.setPluginCategory(handle, "Episodios")
+    xbmcplugin.setContent(handle, "episodes")
 
     episodes = get_episodes(serie_id, temp)
 
     for video in episodes:
-        list_item = xbmcgui.ListItem(label=video["name"])
+        set_video_list(handle, video)
 
-        list_item.setInfo(
-            "video",
-            {"title": video["name"], "plot": video["plot"], "mediatype": "video"},
-        )
-        list_item.setArt(
-            {"thumb": video["thumb"], "icon": video["thumb"], "fanart": video["thumb"]}
-        )
-        list_item.setSubtitles([video["sub"]])
-
-        list_item.setProperty("IsPlayable", "true")
-
-        url = get_url(action="play", video=video["video"])
-
-        is_folder = False
-
-        xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
-
-    xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
-
-    xbmcplugin.endOfDirectory(_handle)
+    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    xbmcplugin.endOfDirectory(handle)
 
 
-def play_video(path):
+def play_video(handle, path):
     """
     Play a video by the provided path.
 
@@ -378,7 +345,7 @@ def play_video(path):
     play_item.setProperty("inputstream", "inputstream.adaptive")
     play_item.setProperty("inputstream.adaptive.manifest_type", "mpd")
     # Pass the item to the Kodi player.
-    xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
+    xbmcplugin.setResolvedUrl(handle, True, listitem=play_item)
 
 
 def router(paramstring):
@@ -389,6 +356,12 @@ def router(paramstring):
     :param paramstring: URL encoded plugin paramstring
     :type paramstring: str
     """
+    # Get the plugin handle as an integer number.
+    handle = int(sys.argv[1])
+    # Set plugin content. It allows Kodi to select appropriate views
+    # for this type of content.
+    xbmcplugin.setContent(handle, "videos")
+
     # Parse a URL-encoded paramstring to the dictionary of
     # {<parameter>: <value>} elements
     params = dict(parse_qsl(paramstring))
@@ -396,22 +369,22 @@ def router(paramstring):
     if not params:
         # If the plugin is called from Kodi UI without any parameters,
         # display the list of video categories
-        list_categories()
+        list_categories(handle)
         return None
 
     if params["action"] == "listing":
         # Display the list of videos in a provided category.
         if params["category"] == "Series":
-            list_series()
+            list_series(handle)
         else:
-            list_videos(params["category"])
+            list_videos(handle, params["category"])
     elif params["action"] == "getSeasons":
-        list_seasons(params["id"], params["temp"])
+        list_seasons(handle, params["id"], params["temp"])
     elif params["action"] == "getEpisodes":
-        list_episodes(params["serie_id"], params["temp"])
+        list_episodes(handle, params["serie_id"], params["temp"])
     elif params["action"] == "play":
         # Play a video from a provided URL.
-        play_video(params["video"])
+        play_video(handle, params["video"])
     else:
         # If the provided paramstring does not contain a supported action
         # we raise an exception. This helps to catch coding errors,

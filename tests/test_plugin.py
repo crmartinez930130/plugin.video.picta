@@ -3,6 +3,8 @@ import sys
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from resources.plugin import get_episodes, get_series, get_videos
+
 sys.modules["xbmc"] = xbmcMock = MagicMock()
 sys.modules["xbmcaddon"] = MagicMock()
 sys.modules["xbmcgui"] = MagicMock()
@@ -19,16 +21,15 @@ class PluginTestCase(TestCase):
 
     @patch("sys.argv")
     @patch("requests.get")
-    def test_get_videos(self, mock_get, mock_argv):
+    def test_get_videos_musicales(self, mock_get, mock_argv):
+        """Test Musicales"""
         mock_argv.return_value = [
             "plugin://plugin.video.picta/",
             "1",
             "",
             "resume:false",
         ]
-        from resources.plugin import get_videos
 
-        # Test Musicales
         json_data = [
             json.loads(
                 self.load_json_file(
@@ -52,7 +53,9 @@ class PluginTestCase(TestCase):
         self.assertDictEqual(videos[0], expected)
         self.assertEqual(len(videos), 296)
 
-        # Test Documentales
+    @patch("requests.get")
+    def test_get_videos_documental(self, mock_get):
+        """Test Documentales"""
         json_data = [
             json.loads(
                 self.load_json_file(
@@ -88,7 +91,9 @@ class PluginTestCase(TestCase):
         self.assertDictEqual(videos[0], expected)
         self.assertEqual(len(videos), 118)
 
-        # Test Peliculas
+    @patch("requests.get")
+    def test_get_videos_pelicula(self, mock_get):
+        """Test Peliculas"""
         json_data = [
             json.loads(
                 self.load_json_file(
@@ -121,18 +126,9 @@ class PluginTestCase(TestCase):
         self.assertDictEqual(videos[0], expected)
         self.assertEqual(len(videos), 445)
 
-    @patch("sys.argv")
     @patch("requests.get")
-    def test_get_series(self, mock_get, mock_argv):
-        mock_argv.return_value = [
-            "plugin://plugin.video.picta/",
-            "1",
-            "",
-            "resume:false",
-        ]
-        from resources.plugin import get_series
-
-        # Test Series
+    def test_get_series(self, mock_get):
+        """Test Series"""
         json_data = [
             json.loads(
                 self.load_json_file(f"./tests/mocks/api_videos_serie_page_{idx}.json")
@@ -153,18 +149,9 @@ class PluginTestCase(TestCase):
         self.assertDictEqual(videos[0], expected)
         self.assertEqual(len(videos), 280)
 
-    @patch("sys.argv")
     @patch("requests.get")
-    def test_get_episodes(self, mock_get, mock_argv):
-        mock_argv.return_value = [
-            "plugin://plugin.video.picta/",
-            "1",
-            "",
-            "resume:false",
-        ]
-        from resources.plugin import get_episodes
-
-        # Test Episodes
+    def test_get_episodes(self, mock_get):
+        """Test Episodes"""
         json_data = [
             json.loads(
                 self.load_json_file(
@@ -184,6 +171,7 @@ class PluginTestCase(TestCase):
             "name": "Biohackers 1x01",
             "thumb": "https://www.picta.cu/imagen/img_30VUtC6.jpeg_380x250",
             "video": "https://www.picta.cu/videos/86c1c873227c410a9f8195c0643c4e6c/manifest.mpd",
+            "genre": "Ciencia ficción, Fantasía",
             "plot": (
                 "Una estudiante de medicina va a la universidad con una misión "
                 "secreta: exponer la supuesta conspiración que vincula una tragedia "
