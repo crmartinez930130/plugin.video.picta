@@ -7,7 +7,7 @@
 @contentType = application/json
 @publicacionEndpoint = {{baseUrl}}/publicacion/
 @serieEndpoint = {{baseUrl}}/serie/
-@serieByTemporadaEndpoint = {{baseUrl}}/temporada/
+@temporadaBySerieEndpoint = {{baseUrl}}/temporada/
 @canalEndpoint = {{baseUrl}}/canal/
 ###
 
@@ -42,7 +42,7 @@ Content-Type: {{contentType}}
 
 ###
 
-GET {{serieByTemporadaEndpoint}}
+GET {{temporadaBySerieEndpoint}}
     ?serie_pelser_id=224
     &ordering=nombre
 Content-Type: {{contentType}}

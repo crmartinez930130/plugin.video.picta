@@ -65,7 +65,7 @@ def get_categories():
     return VIDEOS.keys()
 
 
-def set_likes(video):
+def get_likes(video):
     reproducciones = video.get("cantidad_reproducciones", 0)
     me_gusta = video.get("cantidad_me_gusta", 0)
     no_me_gusta = video.get("cantidad_no_me_gusta", 0)
@@ -110,7 +110,7 @@ def get_videos(category):
 
         for v in result["results"]:
             generos = ""
-            likes = set_likes(v)
+            likes = get_likes(v)
 
             if category == "Musicales":
                 generos = ", ".join(
@@ -189,7 +189,7 @@ def get_episodes(id, temp):
                 g["nombre"]
                 for g in e["categoria"]["capitulo"]["temporada"]["serie"]["genero"]
             )
-            likes = set_likes(e)
+            likes = get_likes(e)
 
             EPISODIOS.append(
                 {
@@ -247,7 +247,7 @@ def get_canales_videos(canal_nombre_raw):
 
         for v in result["results"]:
             # Videos diferentes tipologias no siempre tienen genero
-            likes = set_likes(v)
+            likes = get_likes(v)
             VIDEOS.append(
                 {
                     "name": f'{v["nombre"]}\n{likes}',
@@ -421,7 +421,7 @@ def list_seasons(handle, pelser_id, temporada, name):
     xbmcplugin.setPluginCategory(handle, name)
     xbmcplugin.setContent(handle, "season")
 
-    cant_temp = int(temporada)
+    cant_temp = int(temporada) + 1
 
     for i in range(cant_temp):
         name = f"Temporada {i + 1}"
