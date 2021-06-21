@@ -65,6 +65,16 @@ def get_categories():
     return VIDEOS.keys()
 
 
+def set_likes(video):
+    reproducciones = video.get("cantidad_reproducciones", 0)
+    me_gusta = video.get("cantidad_me_gusta", 0)
+    no_me_gusta = video.get("cantidad_no_me_gusta", 0)
+    comentarios = video.get("cantidad_comentarios", 0)
+    descargas = video.get("cantidad_descargas", 0)
+
+    return f"► {reproducciones} · ♥ {me_gusta} · ▼ {descargas}"
+
+
 def get_videos(category):
     """
     Get the list of videofiles/streams.
@@ -100,6 +110,7 @@ def get_videos(category):
 
         for v in result["results"]:
             generos = ""
+            likes = set_likes(v)
 
             if category == "Musicales":
                 generos = ", ".join(
@@ -112,7 +123,7 @@ def get_videos(category):
 
             VIDEOS[category].append(
                 {
-                    "name": v["nombre"],
+                    "name": f'{v["nombre"]}\n{likes}',
                     "thumb": v["url_imagen"] + "_380x250",
                     "video": v["url_manifiesto"],
                     "genre": generos,
@@ -178,9 +189,11 @@ def get_episodes(id, temp):
                 g["nombre"]
                 for g in e["categoria"]["capitulo"]["temporada"]["serie"]["genero"]
             )
+            likes = set_likes(e)
+
             EPISODIOS.append(
                 {
-                    "name": e["nombre"],
+                    "name": f'{e["nombre"]}\n{likes}',
                     "thumb": e["url_imagen"] + "_380x250",
                     "video": e["url_manifiesto"],
                     "genre": generos,
@@ -234,9 +247,10 @@ def get_canales_videos(canal_nombre_raw):
 
         for v in result["results"]:
             # Videos diferentes tipologias no siempre tienen genero
+            likes = set_likes(v)
             VIDEOS.append(
                 {
-                    "name": v["nombre"],
+                    "name": f'{v["nombre"]}\n{likes}',
                     "thumb": v["url_imagen"] + "_380x250",
                     "video": v["url_manifiesto"],
                     "genre": "",
@@ -353,7 +367,12 @@ def list_series(handle):
         list_item.setArt(
             {"thumb": serie["thumb"], "icon": serie["thumb"], "fanart": serie["thumb"]}
         )
-        url = get_url(action="getSeasons", id=serie["id"], temp=serie["cant_temp"])
+        url = get_url(
+            action="getSeasons",
+            id=serie["id"],
+            temp=serie["cant_temp"],
+            name=serie["name"],
+        )
         is_folder = True
         xbmcplugin.addDirectoryItem(handle, url, list_item, is_folder)
 
@@ -397,16 +416,17 @@ def list_channel_videos(handle, canal_nombre_raw):
     xbmcplugin.endOfDirectory(handle)
 
 
-def list_seasons(handle, pelser_id, temporada):
+def list_seasons(handle, pelser_id, temporada, name):
 
-    xbmcplugin.setPluginCategory(handle, "Temporadas")
+    xbmcplugin.setPluginCategory(handle, name)
     xbmcplugin.setContent(handle, "season")
 
     cant_temp = int(temporada)
 
     for i in range(cant_temp):
-        list_item = xbmcgui.ListItem(label=f"Temporada {i + 1}")
-        url = get_url(action="getEpisodes", serie_id=pelser_id, temp=i)
+        name = f"Temporada {i + 1}"
+        list_item = xbmcgui.ListItem(label=name)
+        url = get_url(action="getEpisodes", serie_id=pelser_id, temp=i, name=name)
         is_folder = True
         xbmcplugin.addDirectoryItem(handle, url, list_item, is_folder)
 
@@ -414,9 +434,9 @@ def list_seasons(handle, pelser_id, temporada):
     xbmcplugin.endOfDirectory(handle)
 
 
-def list_episodes(handle, serie_id, temp):
+def list_episodes(handle, serie_id, temp, name):
 
-    xbmcplugin.setPluginCategory(handle, "Episodios")
+    xbmcplugin.setPluginCategory(handle, name)
     xbmcplugin.setContent(handle, "episodes")
 
     episodes = get_episodes(serie_id, temp)
@@ -479,9 +499,9 @@ def router(paramstring):
         else:
             list_videos(handle, params["category"])
     elif params["action"] == "getSeasons":
-        list_seasons(handle, params["id"], params["temp"])
+        list_seasons(handle, params["id"], params["temp"], params["name"])
     elif params["action"] == "getEpisodes":
-        list_episodes(handle, params["serie_id"], params["temp"])
+        list_episodes(handle, params["serie_id"], params["temp"], params["name"])
     elif params["action"] == "getChannelVideos":
         list_channel_videos(handle, params["canal_nombre_raw"])
     elif params["action"] == "play":

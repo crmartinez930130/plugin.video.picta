@@ -48,7 +48,7 @@ class PluginTestCase(TestCase):
 
         videos = get_videos("Musicales")
         expected = {
-            "name": "CON CUBA NO TE METAS - Virulo",
+            "name": "CON CUBA NO TE METAS - Virulo\n► 2139 · ♥ 158 · ▼ 1581",
             "thumb": "https://www.picta.cu/imagen/img_5mBRhLl.jpeg_380x250",
             "video": "https://www.picta.cu/videos/9b25196524f94db49a07d81cb0b9b471/manifest.mpd",
             "genre": "Conga",
@@ -74,7 +74,7 @@ class PluginTestCase(TestCase):
 
         videos = get_videos("Documentales")
         expected = {
-            "name": "La Historia de Pixar",
+            "name": "La Historia de Pixar\n► 27 · ♥ 4 · ▼ 28",
             "thumb": "https://www.picta.cu/imagen/img_lUFmT8c.jpeg_380x250",
             "video": "https://www.picta.cu/videos/49be1481dfdb4eed84c8394c9544be42/manifest.mpd",
             "genre": "",
@@ -112,7 +112,7 @@ class PluginTestCase(TestCase):
 
         videos = get_videos("Peliculas")
         expected = {
-            "name": "Luca",
+            "name": "Luca\n► 126 · ♥ 11 · ▼ 388",
             "thumb": "https://www.picta.cu/imagen/img_cbyHM4G.jpeg_380x250",
             "video": "https://www.picta.cu/videos/26fcf76822d647a681e2ca0a610cda3e/manifest.mpd",
             "genre": "Animación, Aventura, Comedia, Fantasía",
@@ -174,7 +174,7 @@ class PluginTestCase(TestCase):
 
         videos = get_episodes("224", "0")
         expected = {
-            "name": "Biohackers 1x01",
+            "name": "Biohackers 1x01\n► 238 · ♥ 15 · ▼ 431",
             "thumb": "https://www.picta.cu/imagen/img_30VUtC6.jpeg_380x250",
             "video": "https://www.picta.cu/videos/86c1c873227c410a9f8195c0643c4e6c/manifest.mpd",
             "genre": "Ciencia ficción, Fantasía",
@@ -222,7 +222,7 @@ class PluginTestCase(TestCase):
 
         videos = get_canales_videos("Bachecubano")
         expected = {
-            "name": "Pesquisador Virtual para Cuba en tiempos de COVID19",
+            "name": "Pesquisador Virtual para Cuba en tiempos de COVID19\n► 249 · ♥ 79 · ▼ 86",
             "thumb": "https://www.picta.cu/imagen/img_iMbjsnc.jpeg_380x250",
             "video": "https://www.picta.cu/videos/bd6b880cd2444bc094cbb167aa9c4113/manifest.mpd",
             "genre": "",

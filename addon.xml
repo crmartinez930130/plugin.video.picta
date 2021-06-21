@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
     id="plugin.video.picta"
-    version="1.3.1"
+    version="1.3.2"
     name="Picta"
     provider-name="crmartinez, oleksis">
     <requires>
@@ -21,9 +21,9 @@
         <license>MIT</license>
         <website>https://ww.picta.cu</website>
         <source>https://github.com/oleksis/plugin.video.picta/tree/kodi_19</source>
-        <news>1.3.1 (2021-06-20)
-Add Channels.
-Fix infinite loop in get_canales_videos
+        <news>1.3.2 (2021-06-21)
+Add likes to videos/episodes name.
+Change categories name for current directory name.
         </news>
         <assets>
             <icon>resources/icon.png</icon>
