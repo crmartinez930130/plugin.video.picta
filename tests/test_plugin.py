@@ -20,7 +20,7 @@ class PluginTestCase(TestCase):
     @staticmethod
     def load_json_file(file_path):
         mock_data = ""
-        with open(file_path) as f:
+        with open(file_path, encoding="utf-8") as f:
             mock_data = f.read()
 
         return mock_data
