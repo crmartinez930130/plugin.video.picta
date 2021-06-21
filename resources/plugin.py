@@ -8,7 +8,7 @@
 
 import sys
 from time import sleep
-from urllib.parse import parse_qsl, urlencode
+from urllib.parse import parse_qsl, unquote_plus, urlencode
 
 import requests
 import xbmc
@@ -245,9 +245,9 @@ def get_canales_videos(canal_nombre_raw):
                 }
             )
 
-            next_page = result.get("next")
-            # Avoid rate limit (seconds/request)
-            sleep(1 / 20)
+        next_page = result.get("next")
+        # Avoid rate limit (seconds/request)
+        sleep(1 / 20)
 
     return VIDEOS
 
@@ -385,8 +385,8 @@ def list_canales(handle):
 
 
 def list_channel_videos(handle, canal_nombre_raw):
-    params = dict(parse_qsl(f"canal_nombre={canal_nombre_raw}"))
-    xbmcplugin.setPluginCategory(handle, params["canal_nombre"])
+
+    xbmcplugin.setPluginCategory(handle, unquote_plus(canal_nombre_raw))
 
     videos = get_canales_videos(canal_nombre_raw)
 
