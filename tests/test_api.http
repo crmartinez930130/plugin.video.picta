@@ -36,21 +36,21 @@ Content-Type: {{contentType}}
 ###
 
 GET {{serieEndpoint}}
-    ?page=1
+    ?page=3
     &ordering=-id
 Content-Type: {{contentType}}
 
 ###
 
 GET {{temporadaBySerieEndpoint}}
-    ?serie_pelser_id=224
+    ?serie_pelser_id=107
     &ordering=nombre
 Content-Type: {{contentType}}
 
 ###
 
 GET {{publicacionEndpoint}}
-    ?temporada_id=132
+    ?temporada_id=580
     &page=1
     &page_size=6
     &ordering=nombre

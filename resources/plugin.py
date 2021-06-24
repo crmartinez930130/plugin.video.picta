@@ -3,28 +3,39 @@
 # Author: crmartinez
 # Colaborator: oleksis
 # Created on: 18.3.2021
-# Modified on: 18.6.2021
+# Modified on: 23.6.2021
 
 
 import sys
 from time import sleep
+from typing import Dict, List
 from urllib.parse import parse_qsl, unquote_plus, urlencode
 
 import requests
 import xbmc
+import xbmcaddon
 import xbmcgui
 import xbmcplugin
+
+addon = xbmcaddon.Addon()
 
 # Free sample videos are provided by www.picta.cu
 # Here we use a fixed set of properties simply for demonstrating purposes
 # In a "real life" plugin you will need to get info and links to video files/streams
 # from some web-site or online service.
-VIDEOS = {
-    "Canales": [],
-    "Documentales": [],
-    "Peliculas": [],
-    "Musicales": [],
-    "Series": [],
+CANALES = 30901
+DOCUMENTALES = 30902
+PELICULAS = 30903
+MUSICALES = 30904
+SERIES = 30905
+CATEGORIAS = 30104
+
+VIDEOS: Dict[int, List[Dict[str, str]]] = {
+    CANALES: [],
+    DOCUMENTALES: [],
+    PELICULAS: [],
+    MUSICALES: [],
+    SERIES: [],
 }
 
 ROOT_BASE_URL = "https://www.picta.cu/"
@@ -47,7 +58,7 @@ def get_url(**kwargs):
     return f"{_url}?{urlencode(kwargs)}"
 
 
-def get_categories():
+def get_categories() -> List[int]:
 
     """
     Get the list of video categories.
@@ -62,10 +73,10 @@ def get_categories():
     :return: The list of video categories
     :rtype: list
     """
-    return VIDEOS.keys()
+    return list(VIDEOS.keys())
 
 
-def get_likes(video):
+def get_likes(video: Dict[str, str]) -> str:
     reproducciones = video.get("cantidad_reproducciones", 0)
     me_gusta = video.get("cantidad_me_gusta", 0)
     no_me_gusta = video.get("cantidad_no_me_gusta", 0)
@@ -75,7 +86,7 @@ def get_likes(video):
     return f"► {reproducciones} · ♥ {me_gusta} · ▼ {descargas}"
 
 
-def get_videos(category):
+def get_videos(category: int) -> List[Dict[str, str]]:
     """
     Get the list of videofiles/streams.
 
@@ -85,8 +96,8 @@ def get_videos(category):
     .. note:: Consider using `generators functions <https://wiki.python.org/moin/Generators>`_
         instead of returning lists.
 
-    :param category: Category name
-    :type category: str
+    :param category: Category id
+    :type category: int
     :return: the list of videos in the category
     :rtype: list
     """
@@ -98,13 +109,13 @@ def get_videos(category):
         url_pelic = f"{API_BASE_URL}publicacion/?page={next_page}&tipologia_nombre_raw=Pel%C3%ADcula&ordering=-fecha_creacion"
         url_musicales = f"{API_BASE_URL}publicacion/?page={next_page}&tipologia_nombre_raw=Video%20Musical&ordering=-fecha_creacion"
 
-        if category == "Documentales":
+        if category == DOCUMENTALES:
             r = requests.get(url_docum)
             result = r.json()
-        elif category == "Peliculas":
+        elif category == PELICULAS:
             r = requests.get(url_pelic)
             result = r.json()
-        elif category == "Musicales":
+        elif category == MUSICALES:
             r = requests.get(url_musicales)
             result = r.json()
 
@@ -112,11 +123,11 @@ def get_videos(category):
             generos = ""
             likes = get_likes(v)
 
-            if category == "Musicales":
+            if category == MUSICALES:
                 generos = ", ".join(
                     g["nombre"] for g in v["categoria"]["video"]["genero"]
                 )
-            elif category == "Peliculas":
+            elif category == PELICULAS:
                 generos = ", ".join(
                     g["nombre"] for g in v["categoria"]["pelicula"]["genero"]
                 )
@@ -139,8 +150,8 @@ def get_videos(category):
     return VIDEOS[category]
 
 
-def get_series():
-
+def get_series() -> List[Dict[str, str]]:
+    """Get list of Series"""
     next_page = 1
     # TODO: REFACTOR: ListItem with next
     while next_page:
@@ -151,7 +162,7 @@ def get_series():
         for v in result["results"]:
             generos = ", ".join(g["nombre"] for g in v["genero"])
 
-            VIDEOS["Series"].append(
+            VIDEOS[SERIES].append(
                 {
                     "name": v["nombre"],
                     "id": v["pelser_id"],
@@ -165,11 +176,11 @@ def get_series():
         # Avoid rate limit (seconds/request)
         sleep(1 / 20)
 
-    return VIDEOS["Series"]
+    return VIDEOS[SERIES]
 
 
-def get_episodes(id, temp):
-
+def get_episodes(id: str, temp: str) -> List[Dict[str, str]]:
+    """Get list of Episodes"""
     EPISODIOS = []
     url_temp = f"{API_BASE_URL}temporada/?serie_pelser_id={id}&ordering=nombre"
     r = requests.get(url_temp)
@@ -209,8 +220,8 @@ def get_episodes(id, temp):
     return EPISODIOS
 
 
-def get_canales():
-
+def get_canales() -> List[Dict[str, str]]:
+    """Get lis of Channels"""
     next_page = 1
     # TODO: REFACTOR: ListItem with next
     while next_page:
@@ -219,7 +230,7 @@ def get_canales():
         result = r.json()
 
         for ch in result["results"]:
-            VIDEOS["Canales"].append(
+            VIDEOS[CANALES].append(
                 {
                     "name": ch["nombre"],
                     "id": ch["id"],
@@ -232,10 +243,16 @@ def get_canales():
         # Avoid rate limit (seconds/request)
         sleep(1 / 20)
 
-    return VIDEOS["Canales"]
+    return VIDEOS[CANALES]
 
 
-def get_canales_videos(canal_nombre_raw):
+def get_canales_videos(canal_nombre_raw: str) -> List[Dict[str, str]]:
+    """
+    Get list of Channels´s videos
+
+    :param canal_nombre_raw: Unquote Channel´s name
+    :type canal_nombre_raw: str
+    """
     VIDEOS = []
 
     next_page = 1
@@ -266,18 +283,18 @@ def get_canales_videos(canal_nombre_raw):
     return VIDEOS
 
 
-def list_categories(handle):
+def list_categories(handle) -> None:
     """
     Create the list of video categories in the Kodi interface.
     """
     # Set plugin category. It is displayed in some skins as the name
     # of the current section.
-    xbmcplugin.setPluginCategory(handle, "Categorías")
+    xbmcplugin.setPluginCategory(handle, addon.getLocalizedString(CATEGORIAS))
     categories = get_categories()
 
     for category in categories:
         # Create a list item with a text label and a thumbnail image.
-        list_item = xbmcgui.ListItem(label=category)
+        list_item = xbmcgui.ListItem(label=addon.getLocalizedString(category))
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         # Here we use the same image for all items for simplicity's sake.
         # In a real-life plugin you need to set each image accordingly.
@@ -294,7 +311,7 @@ def list_categories(handle):
         #                          'genre': category,
         #                         'mediatype': 'video'})
         # Create a URL for a plugin recursive call.
-        # Example: plugin://plugin.video.picta/?action=listing&category=Series
+        # Example: plugin://plugin.video.picta/?action=listing&category=30905
         url = get_url(action="listing", category=category)
         # is_folder = True means that this item opens a sub-list of lower level items.
         is_folder = True
@@ -306,9 +323,15 @@ def list_categories(handle):
     xbmcplugin.endOfDirectory(handle)
 
 
-def set_video_list(handle, video):
+def set_video_list(handle: int, video: Dict[str, str]) -> None:
     """
     Set Info and Directory to ListItem
+
+    :param handle: plugin handle
+    :type handle: int
+
+    :param video: Video Dict
+    :type video: Dict
 
     Note: video have 6 keys: "name", "thumb", "video", "genre", "plot", "sub"
     """
@@ -332,14 +355,17 @@ def set_video_list(handle, video):
     xbmcplugin.addDirectoryItem(handle, url, list_item, is_folder)
 
 
-def list_videos(handle, category):
+def list_videos(handle: int, category: int) -> None:
     """
     Create the list of playable videos in the Kodi interface.
 
+    :param handle: plugin handle
+    :type handle: int
+
     :param category: Category name
-    :type category: str
+    :type category: int
     """
-    xbmcplugin.setPluginCategory(handle, category)
+    xbmcplugin.setPluginCategory(handle, addon.getLocalizedString(category))
 
     videos = get_videos(category)
 
@@ -350,9 +376,14 @@ def list_videos(handle, category):
     xbmcplugin.endOfDirectory(handle)
 
 
-def list_series(handle):
+def list_series(handle: int) -> None:
+    """
+    Create list of Series
 
-    xbmcplugin.setPluginCategory(handle, "Series")
+    :param handle: plugin handle
+    :type handle: int
+    """
+    xbmcplugin.setPluginCategory(handle, addon.getLocalizedString(SERIES))
 
     xbmcplugin.setContent(handle, "tvshows")
 
@@ -380,9 +411,14 @@ def list_series(handle):
     xbmcplugin.endOfDirectory(handle)
 
 
-def list_canales(handle):
+def list_canales(handle: int) -> None:
+    """
+    Create list of Channels
 
-    xbmcplugin.setPluginCategory(handle, "Canales")
+    :param handle: plugin handle
+    :type handle: int
+    """
+    xbmcplugin.setPluginCategory(handle, addon.getLocalizedString(CANALES))
 
     canales = get_canales()
 
@@ -403,8 +439,16 @@ def list_canales(handle):
     xbmcplugin.endOfDirectory(handle)
 
 
-def list_channel_videos(handle, canal_nombre_raw):
+def list_channel_videos(handle: int, canal_nombre_raw: str) -> None:
+    """
+    Create list of videos in Channel
 
+    :param handle: plugin handle
+    :type handle: int
+
+    :param canal_nombre_raw: Quote Channel´s name
+    :type canal_nombre_raw: str
+    """
     xbmcplugin.setPluginCategory(handle, unquote_plus(canal_nombre_raw))
 
     videos = get_canales_videos(canal_nombre_raw)
@@ -416,17 +460,35 @@ def list_channel_videos(handle, canal_nombre_raw):
     xbmcplugin.endOfDirectory(handle)
 
 
-def list_seasons(handle, pelser_id, temporada, name):
+def list_seasons(handle: int, pelser_id: str, temporada: str, name: str) -> None:
+    """
+    Create list of Seasons
 
+    :param handle: plugin handle
+    :type handle: int
+
+    :param pelser_id: ID of the Serie
+    :type pelser_id: str
+
+    :param temporada: Count of Seasons
+    :type temporada: str
+
+    :param name: Serie´s name
+    :type name: str
+    """
     xbmcplugin.setPluginCategory(handle, name)
     xbmcplugin.setContent(handle, "season")
-
+    # Note:
+    # La cantidad_temporadas para una serie no está actualizada mediante la API
+    # Ejemplo:
+    #   Serie = {"pelser_id": 107, "nombre": "Rick and Morty", "cantidad_temporadas": 4}
+    # Si consultas {{temporadaBySerieEndpoint}} "count": 5,
     cant_temp = int(temporada) + 1
 
     for i in range(cant_temp):
-        name = f"Temporada {i + 1}"
-        list_item = xbmcgui.ListItem(label=name)
-        url = get_url(action="getEpisodes", serie_id=pelser_id, temp=i, name=name)
+        temp_name = f"Temporada {i + 1}"
+        list_item = xbmcgui.ListItem(label=temp_name)
+        url = get_url(action="getEpisodes", serie_id=pelser_id, temp=i, name=temp_name)
         is_folder = True
         xbmcplugin.addDirectoryItem(handle, url, list_item, is_folder)
 
@@ -434,8 +496,22 @@ def list_seasons(handle, pelser_id, temporada, name):
     xbmcplugin.endOfDirectory(handle)
 
 
-def list_episodes(handle, serie_id, temp, name):
+def list_episodes(handle: int, serie_id: str, temp: str, name: str) -> None:
+    """
+    Create list of Episodes
 
+    :param handle: plugin handle
+    :type handle: int
+
+    :param serie_id: Serie´s ID
+    :type serie_id: str
+
+    :param temp: Index of Season
+    :type temp: str
+
+    :param name: Season´s name
+    :type name: str
+    """
     xbmcplugin.setPluginCategory(handle, name)
     xbmcplugin.setContent(handle, "episodes")
 
@@ -448,7 +524,7 @@ def list_episodes(handle, serie_id, temp, name):
     xbmcplugin.endOfDirectory(handle)
 
 
-def play_video(handle, path):
+def play_video(handle: int, path: str) -> None:
     """
     Play a video by the provided path.
 
@@ -466,13 +542,16 @@ def play_video(handle, path):
     xbmcplugin.setResolvedUrl(handle, True, listitem=play_item)
 
 
-def router(paramstring):
+def router(paramstring: str) -> None:
     """
     Router function that calls other functions
     depending on the provided paramstring
 
     :param paramstring: URL encoded plugin paramstring
     :type paramstring: str
+
+    :Raises
+    ValueError if invalid paramstring
     """
     # Get the plugin handle as an integer number.
     handle = int(sys.argv[1])
@@ -492,12 +571,14 @@ def router(paramstring):
 
     if params["action"] == "listing":
         # Display the list of videos in a provided category.
-        if params["category"] == "Series":
+        category = int(params["category"])
+
+        if category == SERIES:
             list_series(handle)
-        elif params["category"] == "Canales":
+        elif category == CANALES:
             list_canales(handle)
         else:
-            list_videos(handle, params["category"])
+            list_videos(handle, category)
     elif params["action"] == "getSeasons":
         list_seasons(handle, params["id"], params["temp"], params["name"])
     elif params["action"] == "getEpisodes":
@@ -516,7 +597,7 @@ def router(paramstring):
         )
 
 
-def run():
+def run() -> None:
     # Call the router function and pass the plugin call parameters to it.
     # We use string slicing to trim the leading '?' from the plugin call paramstring
     router(sys.argv[2][1:])

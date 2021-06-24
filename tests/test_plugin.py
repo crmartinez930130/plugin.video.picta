@@ -4,6 +4,9 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from resources.plugin import (
+    DOCUMENTALES,
+    MUSICALES,
+    PELICULAS,
     get_canales,
     get_canales_videos,
     get_episodes,
@@ -46,7 +49,7 @@ class PluginTestCase(TestCase):
         ]
         mock_get.return_value.json.side_effect = json_data
 
-        videos = get_videos("Musicales")
+        videos = get_videos(MUSICALES)
         expected = {
             "name": "CON CUBA NO TE METAS - Virulo\n► 2139 · ♥ 158 · ▼ 1581",
             "thumb": "https://www.picta.cu/imagen/img_5mBRhLl.jpeg_380x250",
@@ -72,7 +75,7 @@ class PluginTestCase(TestCase):
         ]
         mock_get.return_value.json.side_effect = json_data
 
-        videos = get_videos("Documentales")
+        videos = get_videos(DOCUMENTALES)
         expected = {
             "name": "La Historia de Pixar\n► 27 · ♥ 4 · ▼ 28",
             "thumb": "https://www.picta.cu/imagen/img_lUFmT8c.jpeg_380x250",
@@ -110,7 +113,7 @@ class PluginTestCase(TestCase):
         ]
         mock_get.return_value.json.side_effect = json_data
 
-        videos = get_videos("Peliculas")
+        videos = get_videos(PELICULAS)
         expected = {
             "name": "Luca\n► 126 · ♥ 11 · ▼ 388",
             "thumb": "https://www.picta.cu/imagen/img_cbyHM4G.jpeg_380x250",

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
     id="plugin.video.picta"
-    version="1.3.3"
+    version="1.4.0"
     name="Picta"
     provider-name="crmartinez, oleksis">
     <requires>
@@ -21,8 +21,9 @@
         <license>MIT</license>
         <website>https://ww.picta.cu</website>
         <source>https://github.com/oleksis/plugin.video.picta/tree/kodi_19</source>
-        <news>1.3.3 (2021-06-21)
-Fix list seasons
+        <news>1.4.0 (2021-06-23)
+Add i18n: en_GB, es_ES
+Add type checking
         </news>
         <assets>
             <icon>resources/icon.png</icon>
