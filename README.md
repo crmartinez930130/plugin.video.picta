@@ -10,6 +10,7 @@ For Kodi matrix and later releases
 
 ## Requirements
 * Python [requests](https://github.com/requests/requests) library packed for KODI.
+* VideoPlayer InputStream: InputStream Adaptative and FFmpeg Direct for KODI
 
 ## Install
 
@@ -19,10 +20,6 @@ For Kodi matrix and later releases
 * Copy the zip file to your Kodi system
 * Open Kodi, go to Add-ons and select "Install from zip file"
 * Select the file `plugin.video.picta-kodi_19.zip`
-
-### Depends
-* System -> Add-ons -> VideoPlayer InputStream -> InputStream Adaptative
-* System -> Add-ons -> VideoPlayer InputStream -> InputStream FFmpeg Direct
 
 ## Copyright and license
 

@@ -8,7 +8,7 @@
 
 import sys
 from time import sleep
-from typing import Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from urllib.parse import parse_qsl, unquote_plus, urlencode
 
 import requests
@@ -17,12 +17,48 @@ import xbmcaddon
 import xbmcgui
 import xbmcplugin
 
+if TYPE_CHECKING:
+    from typing_extensions import TypedDict
+
+    Video = TypedDict(
+        "Video",
+        {
+            "name": str,
+            "thumb": str,
+            "video": str,
+            "genre": str,
+            "plot": str,
+            "sub": str,
+        },
+    )
+
+    Serie = TypedDict(
+        "Serie",
+        {
+            "name": str,
+            "id": str,
+            "thumb": str,
+            "genre": str,
+            "cant_temp": str,
+        },
+    )
+
+    Canal = TypedDict(
+        "Canal",
+        {
+            "name": str,
+            "id": str,
+            "thumb": str,
+            "plot": str,
+        },
+    )
+
+# TODO: Use Enum
+Categoria = int
+
 addon = xbmcaddon.Addon()
 
-# Free sample videos are provided by www.picta.cu
-# Here we use a fixed set of properties simply for demonstrating purposes
-# In a "real life" plugin you will need to get info and links to video files/streams
-# from some web-site or online service.
+# For i18n
 CANALES = 30901
 DOCUMENTALES = 30902
 PELICULAS = 30903
@@ -30,7 +66,7 @@ MUSICALES = 30904
 SERIES = 30905
 CATEGORIAS = 30104
 
-VIDEOS: Dict[int, List[Dict[str, str]]] = {
+COLECCION: Dict[Categoria, Any] = {
     CANALES: [],
     DOCUMENTALES: [],
     PELICULAS: [],
@@ -58,7 +94,7 @@ def get_url(**kwargs):
     return f"{_url}?{urlencode(kwargs)}"
 
 
-def get_categories() -> List[int]:
+def get_categories() -> List[Categoria]:
 
     """
     Get the list of video categories.
@@ -73,10 +109,10 @@ def get_categories() -> List[int]:
     :return: The list of video categories
     :rtype: list
     """
-    return list(VIDEOS.keys())
+    return list(COLECCION.keys())
 
 
-def get_likes(video: Dict[str, str]) -> str:
+def get_likes(video: "Video") -> str:
     reproducciones = video.get("cantidad_reproducciones", 0)
     me_gusta = video.get("cantidad_me_gusta", 0)
     no_me_gusta = video.get("cantidad_no_me_gusta", 0)
@@ -86,7 +122,7 @@ def get_likes(video: Dict[str, str]) -> str:
     return f"► {reproducciones} · ♥ {me_gusta} · ▼ {descargas}"
 
 
-def get_videos(category: int) -> List[Dict[str, str]]:
+def get_videos(category: int) -> List["Video"]:
     """
     Get the list of videofiles/streams.
 
@@ -98,11 +134,12 @@ def get_videos(category: int) -> List[Dict[str, str]]:
 
     :param category: Category id
     :type category: int
+
     :return: the list of videos in the category
     :rtype: list
     """
     result = {}
-    next_page = 1
+    next_page: Optional[int] = 1
     # TODO: REFACTOR: ListItem with next
     while next_page:
         url_docum = f"{API_BASE_URL}publicacion/?page={next_page}&tipologia_nombre_raw=Documental&ordering=-fecha_creacion"
@@ -132,7 +169,7 @@ def get_videos(category: int) -> List[Dict[str, str]]:
                     g["nombre"] for g in v["categoria"]["pelicula"]["genero"]
                 )
 
-            VIDEOS[category].append(
+            COLECCION[category].append(
                 {
                     "name": f'{v["nombre"]}\n{likes}',
                     "thumb": v["url_imagen"] + "_380x250",
@@ -147,11 +184,16 @@ def get_videos(category: int) -> List[Dict[str, str]]:
         # Avoid rate limit (seconds/request)
         sleep(1 / 20)
 
-    return VIDEOS[category]
+    return COLECCION[category]
 
 
-def get_series() -> List[Dict[str, str]]:
-    """Get list of Series"""
+def get_series() -> List["Serie"]:
+    """
+    Get list of Series
+
+    :return: the list of Series
+    :rtype: list
+    """
     next_page = 1
     # TODO: REFACTOR: ListItem with next
     while next_page:
@@ -162,7 +204,7 @@ def get_series() -> List[Dict[str, str]]:
         for v in result["results"]:
             generos = ", ".join(g["nombre"] for g in v["genero"])
 
-            VIDEOS[SERIES].append(
+            COLECCION[SERIES].append(
                 {
                     "name": v["nombre"],
                     "id": v["pelser_id"],
@@ -176,12 +218,23 @@ def get_series() -> List[Dict[str, str]]:
         # Avoid rate limit (seconds/request)
         sleep(1 / 20)
 
-    return VIDEOS[SERIES]
+    return COLECCION[SERIES]
 
 
-def get_episodes(id: str, temp: str) -> List[Dict[str, str]]:
-    """Get list of Episodes"""
-    EPISODIOS = []
+def get_episodes(id: str, temp: str) -> List["Video"]:
+    """
+    Get list of Episodes
+
+    param id: Serie´s ID
+    :type id: str
+
+    :param temp: Index of Season
+    :type temp: str
+
+    :return: the list of episodes
+    :rtype: list
+    """
+    EPISODIOS: List["Video"] = []
     url_temp = f"{API_BASE_URL}temporada/?serie_pelser_id={id}&ordering=nombre"
     r = requests.get(url_temp)
     result = r.json()
@@ -220,8 +273,13 @@ def get_episodes(id: str, temp: str) -> List[Dict[str, str]]:
     return EPISODIOS
 
 
-def get_canales() -> List[Dict[str, str]]:
-    """Get lis of Channels"""
+def get_canales() -> List["Canal"]:
+    """
+    Get lis of Channels
+
+    :return: the list of Channels
+    :rtype: list
+    """
     next_page = 1
     # TODO: REFACTOR: ListItem with next
     while next_page:
@@ -230,7 +288,7 @@ def get_canales() -> List[Dict[str, str]]:
         result = r.json()
 
         for ch in result["results"]:
-            VIDEOS[CANALES].append(
+            COLECCION[CANALES].append(
                 {
                     "name": ch["nombre"],
                     "id": ch["id"],
@@ -243,17 +301,20 @@ def get_canales() -> List[Dict[str, str]]:
         # Avoid rate limit (seconds/request)
         sleep(1 / 20)
 
-    return VIDEOS[CANALES]
+    return COLECCION[CANALES]
 
 
-def get_canales_videos(canal_nombre_raw: str) -> List[Dict[str, str]]:
+def get_canales_videos(canal_nombre_raw: str) -> List["Video"]:
     """
     Get list of Channels´s videos
 
     :param canal_nombre_raw: Unquote Channel´s name
     :type canal_nombre_raw: str
+
+    :return: the list of videos in the Channel
+    :rtype: list
     """
-    VIDEOS = []
+    VIDEOS: List["Video"] = []
 
     next_page = 1
     # TODO: REFACTOR: ListItem with next
@@ -323,7 +384,7 @@ def list_categories(handle) -> None:
     xbmcplugin.endOfDirectory(handle)
 
 
-def set_video_list(handle: int, video: Dict[str, str]) -> None:
+def set_video_list(handle: int, video: "Video") -> None:
     """
     Set Info and Directory to ListItem
 
@@ -333,7 +394,6 @@ def set_video_list(handle: int, video: Dict[str, str]) -> None:
     :param video: Video Dict
     :type video: Dict
 
-    Note: video have 6 keys: "name", "thumb", "video", "genre", "plot", "sub"
     """
     list_item = xbmcgui.ListItem(label=video["name"])
     list_item.setInfo(
@@ -598,6 +658,7 @@ def router(paramstring: str) -> None:
 
 
 def run() -> None:
+    """Main entrypoint"""
     # Call the router function and pass the plugin call parameters to it.
     # We use string slicing to trim the leading '?' from the plugin call paramstring
     router(sys.argv[2][1:])
