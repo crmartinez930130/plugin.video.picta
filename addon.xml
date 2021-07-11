@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
     id="plugin.video.picta"
-    version="1.4.1"
+    version="1.4.2"
     name="Picta"
     provider-name="crmartinez, oleksis">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.requests" version="2.22.0"/>
+        <import addon="script.module.requests" version="2.12.4"/>
         <import addon="inputstream.adaptive" version="2.6.14"/>
         <import addon="inputstream.ffmpegdirect" version="1.19.2"/>
     </requires>
@@ -21,7 +21,7 @@
         <license>MIT</license>
         <website>https://ww.picta.cu</website>
         <source>https://github.com/oleksis/plugin.video.picta/tree/kodi_19</source>
-        <news>1.4.1 (2021-06-30)
+        <news>1.4.2 (2021-07-11)
 Set minimum version for required addons
         </news>
         <assets>
