@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
     id="plugin.video.picta"
-    version="1.4.2"
+    version="2.0.0"
     name="Picta"
     provider-name="crmartinez, oleksis">
     <requires>
@@ -21,13 +21,13 @@
         <license>MIT</license>
         <website>https://ww.picta.cu</website>
         <source>https://github.com/oleksis/plugin.video.picta/tree/kodi_19</source>
-        <news>1.4.2 (2021-07-11)
-Set minimum version for required addons
-        </news>
         <assets>
             <icon>resources/icon.png</icon>
             <fanart>resources/fanart.jpg</fanart>
             <screenshot>resources/images/screenshot-01.png</screenshot>
         </assets>
+        <news>2.0.0 (2021-07-11)
+Add pagination for videos.
+        </news>
     </extension>
 </addon>

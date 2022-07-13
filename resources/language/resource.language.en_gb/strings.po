@@ -253,3 +253,7 @@ msgstr ""
 msgctxt "#30912"
 msgid "Whoops! That password is invalid"
 msgstr ""
+
+msgctxt "#30913"
+msgid "Next page"
+msgstr ""

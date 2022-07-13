@@ -2,7 +2,7 @@
 
 Video plugin for [Kodi](https://github.com/xbmc/xbmc) mediacenter. This Kodi Add-on provides a minimal interface for [Picta](https://www.picta.cu/).
 
-For Kodi v19.4 (Matrix) and later releases
+For Kodi v19.4 (Matrix) and latest  releases
 
 ```pwsh
 winget install -e --id XBMCFoundation.Kodi
@@ -13,7 +13,7 @@ winget install -e --id XBMCFoundation.Kodi
 * Play videos
 
 ## Requirements
-* Python [requests](https://github.com/psf/requests) library packed for KODI.
+* Python [requests](https://github.com/psf/requests) library packed for KODI
 * Add-ons VideoPlayer InputStream
   - [Adaptative](https://github.com/xbmc/inputstream.adaptive)
   - [FFmpeg Direct](https://github.com/xbmc/inputstream.ffmpegdirect)
@@ -26,6 +26,9 @@ winget install -e --id XBMCFoundation.Kodi
 * Copy the zip file to your Kodi system
 * Open Kodi, go to `Add-ons / Add-on browser` and select `Install from zip file`
 * Select the file `plugin.video.picta-kodi_19.zip`
+
+## Development
+This plugin follow the code style from ["Very simple video plugin for Kodi mediacenter"](https://github.com/romanvm/plugin.video.example)
 
 ## Copyright and license
 

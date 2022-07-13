@@ -21,7 +21,7 @@ sys.modules["xbmcgui"] = MagicMock()
 
 class PluginTestCase(TestCase):
     @staticmethod
-    def load_json_file(file_path):
+    def load_json_file(file_path: str) -> str:
         mock_data = ""
         with open(file_path, encoding="utf-8") as f:
             mock_data = f.read()
@@ -32,13 +32,13 @@ class PluginTestCase(TestCase):
     @patch("requests.get")
     def test_get_videos_musicales(self, mock_get, mock_argv):
         """Test Musicales"""
+        videos = []
         mock_argv.return_value = [
             "plugin://plugin.video.picta/",
             "1",
             "",
             "resume:false",
         ]
-
         json_data = [
             json.loads(
                 self.load_json_file(
@@ -49,7 +49,9 @@ class PluginTestCase(TestCase):
         ]
         mock_get.return_value.json.side_effect = json_data
 
-        videos = get_videos(MUSICALES)
+        for idx in range(1, 4):
+            videos.extend(get_videos(MUSICALES, next_page=idx))
+
         expected = {
             "name": "CON CUBA NO TE METAS - Virulo\n► 2139 · ♥ 158 · ▼ 1581",
             "thumb": "https://www.picta.cu/imagen/img_5mBRhLl.jpeg_380x250",
@@ -65,6 +67,7 @@ class PluginTestCase(TestCase):
     @patch("requests.get")
     def test_get_videos_documental(self, mock_get):
         """Test Documentales"""
+        videos = []
         json_data = [
             json.loads(
                 self.load_json_file(
@@ -75,7 +78,9 @@ class PluginTestCase(TestCase):
         ]
         mock_get.return_value.json.side_effect = json_data
 
-        videos = get_videos(DOCUMENTALES)
+        for idx in range(1, 3):
+            videos.extend(get_videos(DOCUMENTALES, next_page=idx))
+
         expected = {
             "name": "La Historia de Pixar\n► 27 · ♥ 4 · ▼ 28",
             "thumb": "https://www.picta.cu/imagen/img_lUFmT8c.jpeg_380x250",
@@ -103,6 +108,7 @@ class PluginTestCase(TestCase):
     @patch("requests.get")
     def test_get_videos_pelicula(self, mock_get):
         """Test Peliculas"""
+        videos = []
         json_data = [
             json.loads(
                 self.load_json_file(
@@ -113,7 +119,9 @@ class PluginTestCase(TestCase):
         ]
         mock_get.return_value.json.side_effect = json_data
 
-        videos = get_videos(PELICULAS)
+        for idx in range(1, 6):
+            videos.extend(get_videos(PELICULAS, next_page=idx))
+
         expected = {
             "name": "Luca\n► 126 · ♥ 11 · ▼ 388",
             "thumb": "https://www.picta.cu/imagen/img_cbyHM4G.jpeg_380x250",
@@ -138,6 +146,7 @@ class PluginTestCase(TestCase):
     @patch("requests.get")
     def test_get_series(self, mock_get):
         """Test Series"""
+        series = []
         json_data = [
             json.loads(
                 self.load_json_file(f"./tests/mocks/api_videos_serie_page_{idx}.json")
@@ -146,7 +155,9 @@ class PluginTestCase(TestCase):
         ]
         mock_get.return_value.json.side_effect = json_data
 
-        videos = get_series()
+        for idx in range(1, 4):
+            series.extend(get_series(next_page=idx))
+
         expected = {
             "name": "Calculo",
             "id": 824,
@@ -155,24 +166,23 @@ class PluginTestCase(TestCase):
             "cant_temp": 2,
         }
 
-        self.assertDictEqual(videos[0], expected)
-        self.assertEqual(len(videos), 280)
+        self.assertDictEqual(series[0], expected)
+        self.assertEqual(len(series), 280)
 
     @patch("requests.get")
     def test_get_episodes(self, mock_get):
         """Test Episodes"""
         json_data = [
             json.loads(
-                self.load_json_file(
-                    f"./tests/mocks/api_videos_serie_temporada_224.json"
-                )
+                self.load_json_file("./tests/mocks/api_videos_serie_temporada_224.json")
             ),
             json.loads(
                 self.load_json_file(
-                    f"./tests/mocks/api_videos_serie_temporada_capitulos.json"
+                    "./tests/mocks/api_videos_serie_temporada_capitulos.json"
                 )
             ),
         ]
+
         mock_get.return_value.json.side_effect = json_data
 
         videos = get_episodes("224", "0")
@@ -195,6 +205,7 @@ class PluginTestCase(TestCase):
     @patch("requests.get")
     def test_get_canales(self, mock_get):
         """Test Canales"""
+        canales = []
         json_data = [
             json.loads(
                 self.load_json_file(f"./tests/mocks/api_videos_canal_page_{idx}.json")
@@ -203,7 +214,9 @@ class PluginTestCase(TestCase):
         ]
         mock_get.return_value.json.side_effect = json_data
 
-        canales = get_canales()
+        for idx in range(1, 4):
+            canales.extend(get_canales(next_page=idx))
+
         expected = {
             "name": "Películas",
             "id": 16,
@@ -218,9 +231,10 @@ class PluginTestCase(TestCase):
         """Test Canales Videos"""
         json_data = [
             json.loads(
-                self.load_json_file(f"./tests/mocks/api_videos_canal_bachecubano.json")
+                self.load_json_file("./tests/mocks/api_videos_canal_bachecubano.json")
             )
         ]
+
         mock_get.return_value.json.side_effect = json_data
 
         videos = get_canales_videos("Bachecubano")

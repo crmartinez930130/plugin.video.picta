@@ -1,9 +1,12 @@
-__pycache__
-*.pyc
+### Python template
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
 
 
 dist/
 build/
+.env
 env/
 *venv/
 *venv.back/
@@ -26,6 +29,10 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+
+# Translations
+*.mo
+*.pot
 
 *.srt
 *.ttml
