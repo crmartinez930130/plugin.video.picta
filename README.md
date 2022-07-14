@@ -17,6 +17,8 @@ winget install -e --id XBMCFoundation.Kodi
 * Add-ons VideoPlayer InputStream
   - [Adaptative](https://github.com/xbmc/inputstream.adaptive)
   - [FFmpeg Direct](https://github.com/xbmc/inputstream.ffmpegdirect)
+    - [Nexus](https://github.com/xbmc/inputstream.ffmpegdirect/tree/Nexus#build-instructions)
+    - [Matrix](https://github.com/xbmc/inputstream.ffmpegdirect/tree/Matrix#build-instructions)
 
 ## Install
 
@@ -24,6 +26,8 @@ winget install -e --id XBMCFoundation.Kodi
 
 * [Download the latest release](https://github.com/oleksis/plugin.video.picta/releases/latest) (`plugin.video.picta-kodi_19.zip`)
 * Copy the zip file to your Kodi system
+  - Windows: `%APPDATA%\Kodi`
+  - Linux: `~/.kodi`
 * Open Kodi, go to `Add-ons / Add-on browser` and select `Install from zip file`
 * Select the file `plugin.video.picta-kodi_19.zip`
 
