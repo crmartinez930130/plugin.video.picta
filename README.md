@@ -34,6 +34,11 @@ winget install -e --id XBMCFoundation.Kodi
 ## Development
 This plugin follow the code style from ["Very simple video plugin for Kodi mediacenter"](https://github.com/romanvm/plugin.video.example)
 
+### Other links
+* [Add-on development](https://kodi.wiki/view/Add-on_development)
+* [Create add-on PRs using Git Subtree Merging](https://kodi.wiki/view/HOW-TO:Create_add-on_PRs_using_Git_Subtree_Merging)
+* [Create a Kodi add-on repository from add-on sources](https://github.com/chadparry/kodi-repository.chad.parry.org/blob/master/tools/create_repository.py)
+
 ## Copyright and license
 
 This add-on is licensed under the MIT License - see [LICENSE.txt](LICENSE.txt) for details.
