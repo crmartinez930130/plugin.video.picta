@@ -22,6 +22,20 @@ winget install -e --id XBMCFoundation.Kodi
 
 ## Install
 
+### Archlinux AUR
+[Package](https://aur.archlinux.org/packages/kodi-plugin-video-picta-bin) available for archlinux users
+
+#### with yay
+```bash
+yay -S kodi-plugin-video-picta-bin
+```
+
+#### with paru
+```bash
+paru -S kodi-plugin-video-picta-bin
+```
+
+
 ### Manual
 
 * [Download the latest release](https://github.com/oleksis/plugin.video.picta/releases/latest) (`plugin.video.picta-kodi_19.zip`)
