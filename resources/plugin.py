@@ -136,7 +136,9 @@ def get_likes(video: "Video") -> str:
     return f"► {reproducciones} · ♥ {me_gusta} · ▼ {descargas}"
 
 
-def get_videos(category: int, next_page: int = COLLECTION["next_href"]) -> List["Video"]:
+def get_videos(
+    category: int, next_page: int = COLLECTION["next_href"]
+) -> List["Video"]:
     """
     Get the list of videofiles/streams.
 
@@ -340,6 +342,45 @@ def get_canales_videos(
                 "sub": v["url_subtitulo"],
             }
         )
+
+    COLLECTION["next_href"] = int(result.get("next") or 0)
+
+    return VIDEOS
+
+
+def get_search(query: str, next_page: int = COLLECTION["next_href"]) -> List["Video"]:
+    """
+    Get list of videos from search
+
+    :param query: Search query
+    :type query: str
+
+    :return: the list of videos from search
+    :rtype: list
+    """
+    VIDEOS: List["Video"] = []
+
+    url_search = (
+        f"{API_BASE_URL}/s/buscar/?criterio={query}&page={next_page}&page_size=10"
+    )
+    r = requests.get(url_search)
+    result = r.json()
+
+    for v in result["results"]:
+        # TODO: Search by kind/tipo de contenido: canal, serie, etc
+        if v["tipo"] == "publicacion":
+            # Videos diferentes tipologias no siempre tienen genero
+            likes = get_likes(v)
+            VIDEOS.append(
+                {
+                    "name": f'{v["nombre"]}\n{likes}',
+                    "thumb": v["url_imagen"] + "_380x250",
+                    "video": v["url_manifiesto"],
+                    "genre": "",
+                    "plot": v["descripcion"],
+                    "sub": v["url_subtitulo"],
+                }
+            )
 
     COLLECTION["next_href"] = int(result.get("next") or 0)
 

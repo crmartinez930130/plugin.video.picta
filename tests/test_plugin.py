@@ -12,6 +12,7 @@ from resources.plugin import (
     get_episodes,
     get_series,
     get_videos,
+    get_search,
 )
 
 sys.modules["xbmc"] = xbmcMock = MagicMock()
@@ -263,5 +264,30 @@ class PluginTestCase(TestCase):
             ),
             "sub": "",
         }
+        self.assertDictEqual(videos[0], expected)
+        self.assertEqual(len(videos), 8)
+
+    @patch("requests.get")
+    def test_get_search(self, mock_get):
+        """Test Search"""
+        json_data = [
+            json.loads(
+                self.load_json_file("./tests/mocks/api_videos_search_page_1.json")
+            ),
+        ]
+
+        mock_get.return_value.json.side_effect = json_data
+
+        videos = get_search(query="cuba", next_page=1)
+
+        expected = {
+            "name": "CON CUBA NO TE METAS - Virulo\n► 3960 · ♥ 356 · ▼ 2507",
+            "thumb": "https://www.picta.cu/imagen/img_5mBRhLl.jpeg_380x250",
+            "video": "https://www.picta.cu/videos/9b25196524f94db49a07d81cb0b9b471/manifest.mpd",
+            "genre": "",
+            "plot": "Ministerio de Cultura de Cuba",
+            "sub": "",
+        }
+
         self.assertDictEqual(videos[0], expected)
         self.assertEqual(len(videos), 8)

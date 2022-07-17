@@ -9,6 +9,7 @@
 @serieEndpoint = {{baseUrl}}/serie/
 @temporadaBySerieEndpoint = {{baseUrl}}/temporada/
 @canalEndpoint = {{baseUrl}}/canal/
+@searchEndpoint = {{baseUrl}}/s/buscar/
 ###
 
 GET {{publicacionEndpoint}}
@@ -69,4 +70,12 @@ Content-Type: {{contentType}}
 GET {{publicacionEndpoint}}
     ?canal_nombre_raw=Bachecubano
     &page=1
+Content-Type: {{contentType}}
+
+###
+
+GET {{searchEndpoint}}
+    ?page=1
+    &page_size=10
+    &criterio=cuba
 Content-Type: {{contentType}}
