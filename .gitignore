@@ -14,7 +14,8 @@ typings/
 mypy_report/
 
 .idea/
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 *.spec
 *.egg-info
 
