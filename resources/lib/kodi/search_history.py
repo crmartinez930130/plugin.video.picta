@@ -11,7 +11,7 @@ class SearchHistory:
 
     def __init__(self, settings: Dict, vfs: VFS):
         self.settings = settings
-        self.size: int= int(self.settings.get("search.history.size") or 10)
+        self.size: int = int(self.settings.get("search.history.size") or 10)
         self.vfs: VFS = vfs
         self.history: Dict = self.vfs.json(self.filename)
 
@@ -31,9 +31,7 @@ class SearchHistory:
         self._save()
 
     def remove(self, query):
-        self.history = {
-            k: v for k, v in self.history.items() if v["query"] != query
-        }
+        self.history = {k: v for k, v in self.history.items() if v["query"] != query}
         self._save()
 
     def clear(self):

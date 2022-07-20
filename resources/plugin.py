@@ -454,7 +454,9 @@ def add_next_page(**kwargs) -> None:
         xbmcplugin.addDirectoryItem(_HANDLE, url, list_item, is_folder)
 
 
-def list_videos_channels(category, category_label: str, videos: List["Video"], query = "") -> None:
+def list_videos_channels(
+    category, category_label: str, videos: List["Video"], query=""
+) -> None:
     """
     Create the list of playable videos in the Kodi interface.
 
@@ -606,6 +608,7 @@ def list_episodes(serie_id: str, temp: str, name: str) -> None:
 
     xbmcplugin.endOfDirectory(_HANDLE)
 
+
 def list_search_root(category: int) -> None:
     """
     Show search root menu
@@ -619,6 +622,7 @@ def list_search_root(category: int) -> None:
     is_folder = True
     xbmcplugin.addDirectoryItem(_HANDLE, url, list_item, is_folder)
     xbmcplugin.endOfDirectory(_HANDLE)
+
 
 def play_video(path: str) -> None:
     """
@@ -689,7 +693,9 @@ def router(paramstring: str) -> None:
                 query = xbmcgui.Dialog().input(addon.getLocalizedString(SEARCH))
             if query:
                 videos = get_search(query, next_page)
-                list_videos_channels(SEARCH, addon.getLocalizedString(SEARCH), videos, query)
+                list_videos_channels(
+                    SEARCH, addon.getLocalizedString(SEARCH), videos, query
+                )
         elif params["action"] == "play":
             # Play a video from a provided URL.
             play_video(params["video"])
