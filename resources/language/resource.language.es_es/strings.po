@@ -178,6 +178,10 @@ msgid "Channels"
 msgstr "Canales"
 
 msgctxt "#30213"
+msgid "Videos"
+msgstr "Videos"
+
+msgctxt "#30213"
 msgid "Groups"
 msgstr "Grupos"
 

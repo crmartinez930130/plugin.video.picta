@@ -17,7 +17,9 @@ import xbmcgui
 import xbmcplugin
 import xbmcvfs
 
-# TODO: Add Search History class/component
+# TODO: Refactor model to class and categories like routess
+#       url = "plugin://plugin.video.picta/search/?action=newSearch&query=%s" % query
+# TODO: Search history cache
 # TODO: Manage requests.exceptions.ConnectionError
 
 # Get the plugin url in plugin:// notation.
@@ -27,7 +29,7 @@ _URL = sys.argv[0]
 try:
     _HANDLE = int(sys.argv[1])
 except ValueError:
-    _HANDLE = 0
+    _HANDLE = -1
 
 if TYPE_CHECKING:
     from typing_extensions import TypedDict
@@ -65,7 +67,6 @@ if TYPE_CHECKING:
         },
     )
 
-# TODO: Use Enum
 Categoria = int
 
 addon = xbmcaddon.Addon()
@@ -79,8 +80,10 @@ DOCUMENTALES = 30902
 PELICULAS = 30903
 MUSICALES = 30904
 SERIES = 30905
-CATEGORIAS = 30104
 NEXT = 30913
+SEARCH = 30101
+NEW_SEARCH = 30201
+CATEGORIAS = 30104
 
 COLLECTION: Dict[Any, Any] = {
     CANALES: [],
@@ -88,6 +91,7 @@ COLLECTION: Dict[Any, Any] = {
     PELICULAS: [],
     MUSICALES: [],
     SERIES: [],
+    SEARCH: [],
     "next_href": 1,
 }
 
@@ -123,7 +127,7 @@ def get_categories() -> List[Categoria]:
     :return: The list of video categories
     :rtype: list
     """
-    return list(COLLECTION.keys())[:5]
+    return list(COLLECTION.keys())[:-1]
 
 
 def get_likes(video: "Video") -> str:
@@ -358,10 +362,10 @@ def get_search(query: str, next_page: int = COLLECTION["next_href"]) -> List["Vi
     :return: the list of videos from search
     :rtype: list
     """
-    VIDEOS: List["Video"] = []
+    COLLECTION[SEARCH] = []
 
     url_search = (
-        f"{API_BASE_URL}/s/buscar/?criterio={query}&page={next_page}&page_size=10"
+        f"{API_BASE_URL}s/buscar/?criterio={query}&page={next_page}&page_size=10"
     )
     r = requests.get(url_search)
     result = r.json()
@@ -371,7 +375,7 @@ def get_search(query: str, next_page: int = COLLECTION["next_href"]) -> List["Vi
         if v["tipo"] == "publicacion":
             # Videos diferentes tipologias no siempre tienen genero
             likes = get_likes(v)
-            VIDEOS.append(
+            COLLECTION[SEARCH].append(
                 {
                     "name": f'{v["nombre"]}\n{likes}',
                     "thumb": v["url_imagen"] + "_380x250",
@@ -384,7 +388,7 @@ def get_search(query: str, next_page: int = COLLECTION["next_href"]) -> List["Vi
 
     COLLECTION["next_href"] = int(result.get("next") or 0)
 
-    return VIDEOS
+    return COLLECTION[SEARCH]
 
 
 def list_categories() -> None:
@@ -450,7 +454,7 @@ def add_next_page(**kwargs) -> None:
         xbmcplugin.addDirectoryItem(_HANDLE, url, list_item, is_folder)
 
 
-def list_videos_channels(category, category_label: str, videos: List["Video"]) -> None:
+def list_videos_channels(category, category_label: str, videos: List["Video"], query = "") -> None:
     """
     Create the list of playable videos in the Kodi interface.
 
@@ -472,12 +476,17 @@ def list_videos_channels(category, category_label: str, videos: List["Video"]) -
             canal_nombre_raw=category_label,
             next_href=str(COLLECTION["next_href"]),
         )
+    elif category == SEARCH:
+        add_next_page(
+            action="newSearch",
+            query=query,
+            next_href=str(COLLECTION["next_href"]),
+        )
     else:
         add_next_page(
             action="listing", category=category, next_href=str(COLLECTION["next_href"])
         )
 
-    # xbmcplugin.addSortMethod(_HANDLE, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     xbmcplugin.endOfDirectory(_HANDLE)
 
 
@@ -571,7 +580,6 @@ def list_seasons(pelser_id: str, temporada: str, name: str) -> None:
         is_folder = True
         xbmcplugin.addDirectoryItem(_HANDLE, url, list_item, is_folder)
 
-    # xbmcplugin.addSortMethod(_HANDLE, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     xbmcplugin.endOfDirectory(_HANDLE)
 
 
@@ -596,9 +604,21 @@ def list_episodes(serie_id: str, temp: str, name: str) -> None:
     for video in episodes:
         set_video_list(video)
 
-    # xbmcplugin.addSortMethod(_HANDLE, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     xbmcplugin.endOfDirectory(_HANDLE)
 
+def list_search_root(category: int) -> None:
+    """
+    Show search root menu
+
+    :param category: Category of search
+    :type category: int
+    """
+    xbmcplugin.setPluginCategory(_HANDLE, addon.getLocalizedString(category))
+    list_item = xbmcgui.ListItem(label=addon.getLocalizedString(NEW_SEARCH))
+    url = get_url(action="newSearch")
+    is_folder = True
+    xbmcplugin.addDirectoryItem(_HANDLE, url, list_item, is_folder)
+    xbmcplugin.endOfDirectory(_HANDLE)
 
 def play_video(path: str) -> None:
     """
@@ -607,7 +627,7 @@ def play_video(path: str) -> None:
     :param path: Fully-qualified video URL
     :type path: str
     """
-    # TODO: Add support for HLS(m3u8)
+    # TODO: Add support for HLS(m3u8) like IPTV
     # Create a playable item with a path to play.
     play_item = xbmcgui.ListItem(path=path)
     play_item.setContentLookup(False)
@@ -644,7 +664,9 @@ def router(paramstring: str) -> None:
             # Display the list of videos in a provided category.
             category_id = int(params["category"])
 
-            if category_id == SERIES:
+            if category_id == SEARCH:
+                list_search_root(category_id)
+            elif category_id == SERIES:
                 list_series(category_id, next_page)
             elif category_id == CANALES:
                 list_canales(category_id, next_page)
@@ -661,6 +683,13 @@ def router(paramstring: str) -> None:
             canal_nombre_raw: str = unquote_plus(params["canal_nombre_raw"])
             videos = get_canales_videos(canal_nombre_raw, next_page)
             list_videos_channels(category_id, canal_nombre_raw, videos)
+        elif params["action"] == "newSearch":
+            query = params.get("query")
+            if not query:
+                query = xbmcgui.Dialog().input(addon.getLocalizedString(SEARCH))
+            if query:
+                videos = get_search(query, next_page)
+                list_videos_channels(SEARCH, addon.getLocalizedString(SEARCH), videos, query)
         elif params["action"] == "play":
             # Play a video from a provided URL.
             play_video(params["video"])

@@ -48,6 +48,11 @@ paru -S kodi-plugin-video-picta-bin
 ## Development
 This plugin follow the code style from ["Very simple video plugin for Kodi mediacenter"](https://github.com/romanvm/plugin.video.example)
 
+### Rules for plugins by [romanvm](https://github.com/romanvm)
+- If a ListItem opens a lower lever list, it must have `isFolder = True`
+- If a ListItem calls a playback function that ends with `setResolvedUrl`, it must have `setProperty('isPlayable', 'true')` and `isFolder = False`
+- If a ListItem does any other task except for mentioned above, is must have `isFolder = False` (and only this)
+
 ### Other links
 * [Add-on development](https://kodi.wiki/view/Add-on_development)
 * [Create add-on PRs using Git Subtree Merging](https://kodi.wiki/view/HOW-TO:Create_add-on_PRs_using_Git_Subtree_Merging)
