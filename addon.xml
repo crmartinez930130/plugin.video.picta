@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon
     id="plugin.video.picta"
-    version="2.0.0"
+    version="2.1.0"
     name="Picta"
     provider-name="crmartinez, oleksis">
     <requires>
@@ -20,15 +20,15 @@
         <disclaimer lang="en_GB">Videos are provided by www.picta.cu.</disclaimer>
         <platform>all</platform>
         <license>MIT</license>
-        <website>https://ww.picta.cu</website>
+        <website>https://www.picta.cu</website>
         <source>https://github.com/oleksis/plugin.video.picta/tree/kodi_19</source>
         <assets>
             <icon>resources/icon.png</icon>
             <fanart>resources/fanart.jpg</fanart>
             <screenshot>resources/images/screenshot-01.png</screenshot>
         </assets>
-        <news>2.0.0 (2021-07-11)
-Add pagination for videos.
+        <news>2.1.0 (2021-07-20)
+Add new Search item
         </news>
     </extension>
 </addon>
