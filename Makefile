@@ -1,4 +1,4 @@
-all: test build
+all: lint typecheck test build
 
 .PHONY: build
 build: 
@@ -6,7 +6,11 @@ build:
 
 .PHONY: test
 test: 
-	python -m unittest discover -v
+	python -m pytest tests/
+
+.PHONY: lint
+lint: 
+	black --check .
 
 .PHONY: typecheck
 typecheck:
