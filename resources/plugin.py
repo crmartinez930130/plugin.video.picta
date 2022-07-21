@@ -17,7 +17,7 @@ import xbmcgui
 import xbmcplugin
 import xbmcvfs
 
-# TODO: Refactor model to class and categories like routess
+# TODO: Refactor model to class and categories like routes
 #       url = "plugin://plugin.video.picta/search/?action=newSearch&query=%s" % query
 # TODO: Search history cache
 # TODO: Manage requests.exceptions.ConnectionError
