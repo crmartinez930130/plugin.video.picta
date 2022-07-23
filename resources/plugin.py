@@ -67,6 +67,16 @@ if TYPE_CHECKING:
         },
     )
 
+    Genero = TypedDict(
+        "Genero",
+        {
+            "id": str,
+            "nombre": str,
+            "tipo": str,
+        },
+    )
+
+
 Categoria = int
 
 addon = xbmcaddon.Addon()
@@ -84,6 +94,7 @@ NEXT = 30913
 SEARCH = 30101
 NEW_SEARCH = 30201
 CATEGORIAS = 30104
+GENEROS = 30906
 
 COLLECTION: Dict[Any, Any] = {
     CANALES: [],
@@ -92,6 +103,7 @@ COLLECTION: Dict[Any, Any] = {
     MUSICALES: [],
     SERIES: [],
     SEARCH: [],
+    GENEROS: [],
     "next_href": 1,
 }
 
@@ -389,6 +401,35 @@ def get_search(query: str, next_page: int = COLLECTION["next_href"]) -> List["Vi
     COLLECTION["next_href"] = int(result.get("next") or 0)
 
     return COLLECTION[SEARCH]
+
+
+def get_generos(next_page: int = COLLECTION["next_href"]) -> List["Genero"]:
+    """
+    Get list of Genres
+
+    :param next_page: Next page
+    :type next_page: int
+
+    :return: the list of Genres
+    :rtype: list
+    """
+    COLLECTION[GENEROS] = []
+    url_generos = f"{API_BASE_URL}genero/?tipo=ci&page={next_page}&page_size=100"
+    r = requests.get(url_generos)
+    result = r.json()
+
+    for g in result["results"]:
+        COLLECTION[GENEROS].append(
+            {
+                "id": g["id"],
+                "nombre": g["nombre"],
+                "tipo": g["tipo"],
+            }
+        )
+
+    COLLECTION["next_href"] = int(result.get("next") or 0)
+
+    return COLLECTION[GENEROS]
 
 
 def list_categories() -> None:

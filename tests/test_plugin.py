@@ -13,6 +13,7 @@ from resources.plugin import (
     get_series,
     get_videos,
     get_search,
+    get_generos,
 )
 
 sys.modules["xbmc"] = xbmcMock = MagicMock()
@@ -291,3 +292,25 @@ class PluginTestCase(TestCase):
 
         self.assertDictEqual(videos[0], expected)
         self.assertEqual(len(videos), 8)
+
+    @patch("requests.get")
+    def test_get_generos(self, mock_get):
+        """Test Generos"""
+        json_data = [
+            json.loads(
+                self.load_json_file("./tests/mocks/api_videos_genero_page_1.json")
+            ),
+        ]
+
+        mock_get.return_value.json.side_effect = json_data
+
+        generos = get_generos(next_page=1)
+
+        expected = {
+            "id": 5,
+            "nombre": "Acción",
+            "tipo": "ci",
+        }
+
+        self.assertDictEqual(generos[0], expected)
+        self.assertEqual(len(generos), 38)

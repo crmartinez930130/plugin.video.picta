@@ -8,6 +8,7 @@
 @publicacionEndpoint = {{baseUrl}}/publicacion/
 @serieEndpoint = {{baseUrl}}/serie/
 @temporadaBySerieEndpoint = {{baseUrl}}/temporada/
+@generoEndpoint = {{baseUrl}}/genero/
 @canalEndpoint = {{baseUrl}}/canal/
 @searchEndpoint = {{baseUrl}}/s/buscar/
 ###
@@ -78,4 +79,9 @@ GET {{searchEndpoint}}
     ?page=1
     &page_size=10
     &criterio=cuba
+Content-Type: {{contentType}}
+
+###
+GET {{generoEndpoint}}
+    ?tipo=ci
 Content-Type: {{contentType}}

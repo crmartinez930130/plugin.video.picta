@@ -246,6 +246,10 @@ msgctxt "#30905"
 msgid "Series"
 msgstr ""
 
+msgctxt "#30906"
+msgid "Genres"
+msgstr ""
+
 msgctxt "#30910"
 msgid "Password"
 msgstr ""
