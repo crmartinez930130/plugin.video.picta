@@ -1,0 +1,13 @@
+site_name: Plugin Video Picta Docs
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]
+          options:
+           docstring_style: sphinx
+nav:
+  - "README.md"
+  - reference.md
+theme:
+  name: "material"

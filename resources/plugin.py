@@ -7,7 +7,7 @@
 
 
 import sys
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List, Union
 from urllib.parse import parse_qsl, unquote_plus, urlencode
 
 import requests
@@ -111,7 +111,7 @@ ROOT_BASE_URL = "https://www.picta.cu/"
 API_BASE_URL = "https://api.picta.cu/v2/"
 
 
-def get_url(**kwargs):
+def get_url(**kwargs: Union[str, int]) -> str:
     """
     Create a URL for calling the plugin recursively from the given set of keyword arguments.
 
@@ -485,8 +485,8 @@ def add_next_page(**kwargs) -> None:
     """
     Add a ListItem to the Kodi interface to show the next page.
 
-    :param category_id: Category ID
-    :type category_id: int
+    :param kwargs: "argument=value" pairs
+    :type kwargs: dict
     """
     if COLLECTION["next_href"] > 1:
         list_item = xbmcgui.ListItem(label=addon.getLocalizedString(NEXT))
