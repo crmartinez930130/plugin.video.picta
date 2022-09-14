@@ -1,0 +1,57 @@
+### Python template
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+
+dist/
+build/
+site/
+.env
+env/
+*venv/
+*venv.back/
+typings/
+mypy_report/
+
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.spec
+*.egg-info
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+*.srt
+*.ttml
+*.sbv
+*.vtt
+*.flv
+*.mp4
+*.m4a
+*.m4v
+*.mp3
+*.3gp
+*.wav
+*.ape
+*.mkv
+*.swf
+*.part
+
+debug.log
+*.zip

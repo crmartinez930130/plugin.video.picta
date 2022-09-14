@@ -1,0 +1,87 @@
+
+@hostname = api.picta.cu
+@port = 443
+@host = {{hostname}}:{{port}}
+@version = v2
+@baseUrl = https://{{host}}/{{version}}
+@contentType = application/json
+@publicacionEndpoint = {{baseUrl}}/publicacion/
+@serieEndpoint = {{baseUrl}}/serie/
+@temporadaBySerieEndpoint = {{baseUrl}}/temporada/
+@generoEndpoint = {{baseUrl}}/genero/
+@canalEndpoint = {{baseUrl}}/canal/
+@searchEndpoint = {{baseUrl}}/s/buscar/
+###
+
+GET {{publicacionEndpoint}}
+    ?page=1
+    &tipologia_nombre_raw=Video%20Musical
+    &ordering=-fecha_creacion
+Content-Type: {{contentType}}
+
+###
+
+GET {{publicacionEndpoint}}
+    ?page=1
+    &tipologia_nombre_raw=Documental
+    &ordering=-fecha_creacion
+Content-Type: {{contentType}}
+
+###
+
+GET {{publicacionEndpoint}}
+    ?page=1
+    &tipologia_nombre_raw=Pel%C3%ADcula
+    &ordering=-fecha_creacion
+Content-Type: {{contentType}}
+
+###
+
+GET {{serieEndpoint}}
+    ?page=3
+    &ordering=-id
+Content-Type: {{contentType}}
+
+###
+
+GET {{temporadaBySerieEndpoint}}
+    ?serie_pelser_id=107
+    &ordering=nombre
+Content-Type: {{contentType}}
+
+###
+
+GET {{publicacionEndpoint}}
+    ?temporada_id=580
+    &page=1
+    &page_size=6
+    &ordering=nombre
+Content-Type: {{contentType}}
+
+###
+
+GET {{canalEndpoint}}
+    ?page=1
+    &ordering=-cantidad_suscripciones
+    &nombre=
+Content-Type: {{contentType}}
+
+###
+
+GET {{publicacionEndpoint}}
+    ?canal_nombre_raw=Bachecubano
+    &page=1
+Content-Type: {{contentType}}
+
+###
+
+GET {{searchEndpoint}}
+    ?page=1
+    &page_size=10
+    &criterio=cuba
+Content-Type: {{contentType}}
+
+###
+GET {{generoEndpoint}}
+    ?tipo=ci
+Content-Type: {{contentType}}
